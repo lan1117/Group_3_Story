@@ -49,5 +49,5 @@ void loop(void) {
   XBee.write("\n");
   //XBee.write(" *C\n");
  
-  delay(5000);
+  delay(2000);
 }

@@ -5,8 +5,8 @@ var io = require('socket.io')(http);
 var message;
 //var temp = 0;
 var count = 0;
-var flag = [0, 0];
-var tempArray = [0,0];
+var flag = [0, 0 ,0];
+var tempArray = [0, 0, 0];
 
 var portName = process.argv[2],
 portConfig = {
@@ -44,17 +44,25 @@ sp.on("open", function () {
        tempArray[0]= parseFloat(message[1]);
  			 flag[0] = 1;
        count ++;
+			 io.emit(message[0]);
 		 };
 		 if(message[0]=='2' && flag[1] == 0){
 
 	      tempArray[1] = parseFloat(message[1]);
 				flag[1] = 1;
 	      count ++;
+				io.emit(message[0]);
 	   };
-		 if (count == 2){
-			 var average = ((tempArray[0]+tempArray[1]) / count).toFixed(2);
+		 if(message[0] == '3' && flag[2] == 0){
+        tempArray[2]= parseFloat(message[1]);
+  			 flag[2] = 1;
+        count ++;
+				io.emit(message[0]);
+ 		 };
+		 if (count == 3){
+			 var average = ((tempArray[0] + tempArray[1] + tempArray[2]) / count).toFixed(2);
 			 count = 0;
-			 flag = [0,0];
+			 flag = [0, 0, 0];
 
 		//temp = parseFloat(message[1]);
 		//console.log(temp);

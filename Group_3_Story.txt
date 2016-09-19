@@ -6,8 +6,14 @@ Went to town and ate an apple
 
 He met a princess
 
-<<<<<<< HEAD
 A girl with beautiful eyes and hair
-=======
+
 Hi guys~    from Yixuan
->>>>>>> refs/remotes/origin/master
+
+A girl with beautiful eyes and long hair
+
+"Hey!" Pierre said.
+
+with smile
+
+Hi I am Lanluo~

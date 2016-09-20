@@ -37,30 +37,28 @@ http.listen(3000, function(){
 sp.on("open", function () {
   console.log('open');
   sp.on('data', function(data) {
-    //console.log('data received: ' + data);
-		message = data.split(':'); //separate data
-    //console.log(message);
-		if(message[0] == '1' && flag[0] == 0){
-       tempArray[0]= parseFloat(message[1]);
- 			 flag[0] = 1;
-       count ++;
-		 };
-		 if(message[0]=='2' && flag[1] == 0){
+	message = data.split(':'); //separate data
 
-	      tempArray[1] = parseFloat(message[1]);
-				flag[1] = 1;
-	      count ++;
-	   };
-		 if (count == 2){
-			 var average = ((tempArray[0]+tempArray[1]) / count).toFixed(2);
-			 count = 0;
-			 flag = [0,0];
+	if(message[0] == '1' && flag[0] == 0){
+		tempArray[0]= parseFloat(message[1]);
+ 		flag[0] = 1;
+       	count ++;
+	}
 
-		//temp = parseFloat(message[1]);
-		//console.log(temp);
-		   var Temp = "Temperature is " + average;
-			 console.log(average);
-       io.emit("chat message", "An XBee says: " + Temp);
-		 };
+	if(message[0]=='2' && flag[1] == 0){
+		tempArray[1] = parseFloat(message[1]);
+		flag[1] = 1;
+	    count ++;
+	}
+
+	if (count == 2){
+		var average = ((tempArray[0]+tempArray[1]) / count).toFixed(2);
+		count = 0;
+		flag = [0,0];
+
+		var Temp = "Temperature is " + average;
+		console.log(average);
+    	io.emit("chat message", "An XBee says: " + Temp);
+	}
   });
 });

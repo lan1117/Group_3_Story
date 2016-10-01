@@ -4,7 +4,7 @@
   "description": "Challenges for EC544 at Boston University",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "ports": "node ./Challenges/Challenge2/listPorts.js"
+    "ports": "node ./Pi_Test/listPorts.js"
   },
   "repository": {
     "type": "git",

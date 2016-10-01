@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+  <title>Historical Data</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font: 13px Helvetica, Arial; background-color: #f8f8f8;text-align: center;}
+    h1 {margin-top:50px; margin-left:500px;}
+    #button {margin-top:50px;text-align:center; margin-left: auto; margin-right: auto;margin-bottom:50px;width:200px; height:75px;color:black;font-size:18px;}
+    #graphdiv{margin-left: 50px;width:1000px; height:400px ;}
+    hr {width:700px; text-align:center; margin-left: auto; margin-right: auto; margin-top:100px;}
+    footer {font-family: Arial; text-align:center; margin-top:20px;margin-bottom:100px;}
+    #value_group {margin-left:625px; margin-top: -317px;}
+  </style>
+  <!-- Bootstrap Core CSS -->
+  <link href="bootstrap.min.css" rel="stylesheet">
+
+  <!-- MetisMenu CSS -->
+  <link href="metisMenu.css" rel="stylesheet">
+
+
+  <!-- Timeline CSS -->
+  <link href="timeline.css" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link href="sb-admin-2.css" rel="stylesheet">
+
+  <!-- Custom Fonts -->
+  <link href="font-awesome.min.css" rel="stylesheet" type="text/css">
+
+  <script src= "https://cdnjs.cloudflare.com/ajax/libs/smoothie/1.27.0/smoothie.min.js"></script>
+  <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+  <script src="jquery.min.js"></script>
+  <script src="http://smoothiecharts.org/smoothie.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="smoothie.js"></script>
+  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dygraph/1.1.1/dygraph-combined-dev.js"></script>
+  <script src="main.js"></script>
+  <script src= "https://cdnjs.cloudflare.com/ajax/libs/smoothie/1.27.0/smoothie.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dygraph/1.1.1/dygraph-combined-dev.js"></script>
+  <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+</head>
+<body>
+  <button id = "button" type="button">Draw Historical Graph</button>
+  <div style ="margin-left : auto; margin-right: auto;">
+    <a><i class="fa fa-bar-chart-o fa-fw"></i>
+      Start Time: <input type="text" id="starttime" class="form-control" placeholder="Format:yy/mm/dd/hh/min"></a>
+      <a><i class="fa fa-bar-chart-o fa-fw" style="padding-left: 50px"></i>
+       End Time: <input type="text" id="endtime" class="form-control" placeholder="Format:yy/mm/dd/hh/min"><br></a>
+     </div>
+     <!-- /.panel-heading -->
+     <div class="panel-body">
+       <!-- <div id="morris-area-chart"></div>-->
+       <canvas id="mycanvas" width="500" height="400"></canvas>
+       <div id="dy">
+         <!-- <div id="graphdiv"></div>-->
+       </div>
+     </div>
+     <!-- /.panel-body -->
+     <div id="dy">
+      <div id="graphdiv"></div>
+    </div>
+    <hr>
+    <footer>
+      <h4>Using Node.js | Socket.io | Express.js | Mongodb</h4>
+      <br>
+      <a href="#"><h4>Bring Me Back To Top</h4></a>
+    </footer>
+
+
+    <!--  -------------Historical Graph------------- -->
+
+    <script>
+      var socket = io();
+
+      $("#button").click(function(){
+        var starttime = $("#starttime").val();
+        var endtime = $("#endtime").val();
+        var string1 = "average";
+        var string2 = ",";
+        // starttime: hh/mm/ss
+        string= string1.concat(string2,starttime,string2,endtime);
+        socket.emit("historical",string);
+        $("#dy").find('div:contains(someText)').remove();
+        var tag  = '<div id="graphdiv"></div>'
+        $("#dy").append(tag);
+        $("#mycanvas").hide();
+      });
+
+      socket.on("average_draw", function(newString) {
+
+        var g = new Dygraph(document.getElementById("graphdiv"),
+          newString,
+          {
+            labels: [ "Time", "Average-Temperature" ]
+
+          });
+      });
+
+    </script>
+  </body>
+  </html>

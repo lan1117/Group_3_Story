@@ -127,6 +127,10 @@ app.get('/', function(req, res){
 	res.sendfile('historical.html');
 });
 
+app.get('/',function(req,res){  
+    res.redirect('https://localhost:3000/' + req.url)
+})
+
 // io.on('connection', function(socket){
 // 	console.log('a user connected');
 // 	socket.on('disconnect', function(){
@@ -204,15 +208,12 @@ io.on('connection', function(socket){
 	//this is a private message
 	socket.on('historical', function(msg){
 		var str = null;
+		var str1 = null;
 		console.log("Time interval from user: " + msg);
 
 		var findDocuments = function(db, callback) {
-			//string = {0-->id, 1-->starttime(yy/mm/dd/hh/mm), 2-->endtime}
+			//string = {0-->collection, 1-->starttime(yy/mm/dd/hh/mm), 2-->endtime, 3-->id}
 			var string = msg.split(",");
-			var date = new Date()
-			//get date and represent as string
-			// console.log(date.toLocaleString());
-			// console.log("starttime = " + string[1]);
 
 			var  starttime = string[1].split("/");
 			var  endtime = string[2].split("/");
@@ -221,32 +222,31 @@ io.on('connection', function(socket){
    			var endstring = "20" + endtime[0] + "-" + endtime[1] + "-" + endtime[2] + " " + endtime[3] + ":" + endtime[4] + ":00";
    			var timestamp1 = Date.parse(new Date(startstring));
    			var timestamp2 = Date.parse(new Date(endstring));
-   			// console.log("starstring = " + startstring);
-   			// console.log("endstring = " + endstring);
-   			// console.log("After parse 1: " +timestamp1);
-   			// console.log("After parse 2: " +timestamp2);
+   			console.log("starstring = " + startstring);
+   			console.log("endstring = " + endstring);
+   			console.log("After parse 1: " +timestamp1);
+   			console.log("After parse 2: " +timestamp2);
 
-   			var query1 = '{\"sensor_id\":string[0]}';
-   			var query2 = '{\"sensor_id\":string[0],\"cal_time\":{$gt:timestamp1,$lt:timestamp2}}';
+   			
    			if(string[1] != "" && string[2] != ""){
-   				var cursor = db.collection('average').find({"sensor_id":string[0],"cal_time":{$gt:timestamp1,$lt:timestamp2}});
+   				var cursor = db.collection(string[0]).find({"sensor_id":string[3],"cal_time":{$gt:timestamp1,$lt:timestamp2}});
    			}
    			else{
-   				var cursor =db.collection('average').find({"sensor_id":string[0]});
+   				var cursor =db.collection(string[0]).find({"sensor_id":string[3]});
    			}
 
    			cursor.each(function(err, doc) {
    				assert.equal(err, null);
    				if (doc != null) {
    					var d = new Date(parseInt(doc.cal_time));
-   					str = str + d.getFullYear()+"/"+ (d.getMonth()+1)+"/"+d.getDate()+" "+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds()+"," + doc.temperature+"\n";
+         			str=str+d.getFullYear()+"/"+ (d.getMonth()+1)+"/"+d.getDate()+" "+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds()+"," + doc.temperature+"\n";
    					socket.emit('average_draw',str);
-
+   					console.log(str);
    				} else {
+   					console.log("doc is null");
    					callback();
    				}
    			});
-
    		};
 
    		MongoClient.connect(url, function(err, db) {

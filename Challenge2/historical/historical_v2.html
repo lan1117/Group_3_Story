@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>SB Admin 2 - Bootstrap Admin Theme</title>
+    <style>
+
+      #button {margin-top:30px; margin-left:0px;margin-bottom:0px;width:200px; height:25px;color:orange;font-size:15px;background-color: #f8f8f9}
+    </style>
+    <!-- Bootstrap Core CSS -->
+    <link href="bootstrap.min.css" rel="stylesheet">
+
+   <!-- MetisMenu CSS -->
+    <link href="metisMenu.css" rel="stylesheet">
+
+
+    <!-- Timeline CSS -->
+    <link href="timeline.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="sb-admin-2.css" rel="stylesheet">
+
+
+    <!-- Custom Fonts -->
+    <link href="font-awesome.min.css" rel="stylesheet" type="text/css">
+
+   <script src= "https://cdnjs.cloudflare.com/ajax/libs/smoothie/1.27.0/smoothie.min.js"></script>
+       <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+           <script src="jquery.min.js"></script>
+    <script src="http://smoothiecharts.org/smoothie.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="smoothie.js"></script>
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dygraph/1.1.1/dygraph-combined-dev.js"></script>
+    <script src="main.js"></script>
+
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <div id="wrapper">
+
+        <!-- Navigation -->
+        <nav class="navbar navbar-inverse navbar-static-top" style="font:15px, Helvetica, Arial">
+            <div class="navbar-header">
+                <center><a class="navbar-brand">Group 3</a></certer>
+            </div>
+            <!-- /.navbar-header -->
+
+
+
+            <div class="navbar-default sidebar" >
+                <div class="sidebar-nav navbar-collapse">
+                        <li>
+                          <button id="button" type="button" onclick="window.location.href='/Users/Isetan5tvxq/Desktop/ec544/challeng/challenge2/realtime.html';">Real Time Temperature</button>
+                        </li><br>
+                        <!-- <li> -->
+                            <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Historical<span class="fa arrow"></span><br></a>
+                            <br><center>
+                            <a><i class="fa fa-bar-chart-o fa-fw"></i>Start Time: <br><input type="text" id="starttime" class="form-control" placeholder="Format:yy/mm/dd/hh/mm"></a><br>
+                            <a><i class="fa fa-bar-chart-o fa-fw"></i>End Time: <br><input type="text" id="endtime" class="form-control" placeholder="Format:yy/mm/dd/hh/mm"><br></a>
+                            </center>
+                            <ul class="nav nav-second-level">
+                              <ul class="nav nav-second-level">
+                                <li>
+                                    <a id="S1">Sensor 1</a>
+                                </li>
+                                <li>
+                                    <a id="S2">Sensor 2</a>
+                                </li>
+                                <li>
+                                    <a id="S3">Sensor 3</a>
+                                </li>
+                                <li>
+                                    <a id="S4">Sensor 4</a>
+                                </li>
+                                <li>
+                                    <a id="average">Average</a>
+                                </li>
+                                <br><br>
+                                <a id="chart-name">Historical Chart</a>
+                            </ul>
+                            <!-- /.nav-second-level -->
+                        </li>
+
+                    </ul>
+                </div>
+                <div class="panel-body">
+                             <!-- <div id="morris-area-chart"></div>-->
+                               <canvas id="mycanvas" width="500" height="400"></canvas>
+                               <div id="dy">
+                            <div id="graphdiv"></div>
+                                </div>
+                          </div>
+                <!-- /.sidebar-collapse -->
+            </div>
+            <!-- /.navbar-static-side -->
+        </nav>
+
+  <script>
+
+
+    var socket = io.connect();
+
+
+    $("#S1").click(function(){
+        var starttime = $("#starttime").val();
+        var endtime = $("#endtime").val();
+        var string1 = "1";
+        var string2 = ",";
+        $("#chart-name").text("Sensor 1 Historical Data Chart");
+        string= string1.concat(string2,starttime,string2,endtime);
+        socket.emit("buttonPress",string);
+        $("#dy").find('div:contains(someText)').remove();
+        var tag  = '<div id="graphdiv"></div>'
+        $("#dy").append(tag);
+        $("#mycanvas").hide();
+    });
+
+
+    $("#S2").click(function(){
+    var starttime = $("#starttime").val();
+    var endtime = $("#endtime").val();
+    var string1 = "2";
+    var string2 = ",";
+    string= string1.concat(string2,starttime,string2,endtime);
+    $("#chart-name").text("Sensor 2 Historical Data Chart");
+    socket.emit("buttonPress",string);
+    $("#dy").find('div:contains(someText)').remove();
+    var tag  = '<div id="graphdiv"></div>'
+    $("#dy").append(tag);
+    $("#mycanvas").hide();
+    });
+
+
+    $("#S3").click(function(){
+    var starttime = $("#starttime").val();
+    var endtime = $("#endtime").val();
+    var string1 = "3";
+    var string2 = ",";
+    string= string1.concat(string2,starttime,string2,endtime);
+    socket.emit("buttonPress",string);
+    $("#chart-name").text("Sensor 3 Historical Data Chart");
+    $("#dy").find('div:contains(someText)').remove();
+    var tag  = '<div id="graphdiv"></div>'
+    $("#dy").append(tag);
+    $("#mycanvas").hide();
+    });
+
+    $("#S4").click(function(){
+    var starttime = $("#starttime").val();
+    var endtime = $("#endtime").val();
+    var string1 = "4";
+    var string2 = ",";
+    string= string1.concat(string2,starttime,string2,endtime);
+    $("#chart-name").text("Sensor 4 Historical Data Chart");
+    //string.append(","+starttime);
+    //string.append(","+endtime);
+    socket.emit("buttonPress",string);
+    $("#dy").find('div:contains(someText)').remove();
+    var tag  = '<div id="graphdiv"></div>'
+    $("#dy").append(tag);
+    $("#mycanvas").hide();
+    });
+
+    $("#average").click(function(){
+    var starttime = $("#starttime").val();
+    var endtime = $("#endtime").val();
+    var string1 = "A";
+    var string2 = ",";
+    string= string1.concat(string2,starttime,string2,endtime);
+    socket.emit("buttonPress",string);
+    $("#chart-name").text("Average Historical Data Chart");
+    $("#dy").find('div:contains(someText)').remove();
+    var tag  = '<div id="graphdiv"></div>'
+    $("#dy").append(tag);
+    $("#mycanvas").hide();
+    });
+
+    socket.on("A1", function(newString) {
+
+
+var g = new Dygraph(document.getElementById("graphdiv"),
+    newString,
+{
+    labels: [ "Time", "Sensor-A" ]
+
+  });
+});
+        </script>
+</body>
+
+</html>

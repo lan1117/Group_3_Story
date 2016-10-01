@@ -127,8 +127,8 @@ app.get('/', function(req, res){
 	res.sendfile('historical.html');
 });
 
-app.get('/',function(req,res){  
-    res.redirect('https://localhost:3000/' + req.url)
+app.get('/realtime',function(req,res){  
+    res.sendfile('realtime.html');
 })
 
 // io.on('connection', function(socket){

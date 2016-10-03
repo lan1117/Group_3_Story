@@ -152,6 +152,7 @@
       socket.on("draw", function(newString) {
         if(newString == "warning"){
           $("#warning").text("Sorry we do not find data in this period of time," + "\n" +"please re-enter in corrent format!");
+	}
         else{
 	  $("#warning").text("Data has been loaded successfully!");
           var g = new Dygraph(document.getElementById("graphdiv"),

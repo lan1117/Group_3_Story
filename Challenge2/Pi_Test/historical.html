@@ -5,28 +5,28 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font: 13px Helvetica, Arial; background-color: #f8f8f8;text-align: center;}
-    h1 {margin-top:50px; margin-left:500px;}
-    .buttons {margin-top:50px;text-align:center; margin-left: auto; margin-right: auto;margin-bottom:50px;width:60px; height:25px;color:black;font-size:12px;}
-    #graphdiv{margin-left: 50px;width:1000px; height:400px ;}
-    hr {width:700px; text-align:center; margin-left: auto; margin-right: auto; margin-top:100px;}
-    footer {font-family: Arial; text-align:center; margin-top:20px;margin-bottom:100px;}
-    #value_group {margin-left:625px; margin-top: -317px;}
+    h1 {margin-top:10px;font-size: 34px;}
+    #mycanvas {margin-top: 100px;}
+    .buttons {margin-top:20px;text-align:center; margin-left: auto; margin-right: auto;margin-bottom:30px;width:70px; height:28px;color:black;font-size:14px;}
+    #graphdiv{width:1000px; height:400px ;}
+    #header1{background: rgb();padding-top: 30px; margin-bottom: 20px}
+    hr {width:700px; margin-top:100px;}
+    footer {font-family: Arial; margin-top:20px;margin-bottom:100px;}
   </style>
   <!-- Bootstrap Core CSS -->
-  <!-- <link href="bootstrap.min.css" rel="stylesheet"> -->
+  <link href="bootstrap.min.css" rel="stylesheet">
 
   <!-- MetisMenu CSS -->
-  <!-- <link href="metisMenu.css" rel="stylesheet"> -->
-
+  <link href="metisMenu.css" rel="stylesheet">
 
   <!-- Timeline CSS -->
-  <!-- <link href="timeline.css" rel="stylesheet"> -->
+  <link href="timeline.css" rel="stylesheet">
 
   <!-- Custom CSS -->
-  <!-- <link href="sb-admin-2.css" rel="stylesheet"> -->
+  <link href="sb-admin-2.css" rel="stylesheet">
 
   <!-- Custom Fonts -->
-  <!-- <link href="font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+  <link href="font-awesome.min.css" rel="stylesheet" type="text/css">
 
   <script src= "https://cdnjs.cloudflare.com/ajax/libs/smoothie/1.27.0/smoothie.min.js"></script>
   <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
@@ -39,18 +39,26 @@
   <script src="main.js"></script>
 </head>
 <body>
-  <button class = "buttons" id = "button" type="button">Average</button>
-  <button class = "buttons" id = "sensor1" type="button">Sensor 1</button>
-  <button class = "buttons" id = "sensor2" type="button">Sensor 2</button>
-  <button class = "buttons" id = "sensor3" type="button">Sensor 3</button>
-  <button class = "buttons" id = "sensor4" type="button">Sensor 4</button>
+  <div id="header1">
+    <h1>Historical Temperature Graph</h1>
+    <div style="padding-top: 15px">
+      <label id="warning" style="color: red; font-size: 20px;">Please pay attention to input format!
+	<br>If your input is not complete, we will provide all data for you.</label>
+    </div>
+  </div>
 
-  <div style ="margin-left : auto; margin-right: auto;">
-    <a><i class="fa fa-bar-chart-o fa-fw"></i>
+  <div>
+    <a><i class="fa fa-bar-chart-o fa-fw" style="font-size:14px"></i>
       Start Time: <input type="text" id="starttime" class="form-control" placeholder="Format:yy/mm/dd/hh/min"></a>
-      <a><i class="fa fa-bar-chart-o fa-fw" style="padding-left: 50px"></i>
+      <a><i class="fa fa-bar-chart-o fa-fw" style="padding-left: 50px;font-size:14px"></i>
        End Time: <input type="text" id="endtime" class="form-control" placeholder="Format:yy/mm/dd/hh/min"><br></a>
      </div>
+
+     <button class = "buttons" id = "average" type="button">Average</button>&nbsp;&nbsp;&nbsp;
+     <button class = "buttons" id = "sensor1" type="button">Sensor 1</button>&nbsp;&nbsp;&nbsp;
+     <button class = "buttons" id = "sensor2" type="button">Sensor 2</button>&nbsp;&nbsp;&nbsp;
+     <button class = "buttons" id = "sensor3" type="button">Sensor 3</button>&nbsp;&nbsp;&nbsp;
+     <button class = "buttons" id = "sensor4" type="button">Sensor 4</button>
      <!-- /.panel-heading -->
      <div class="panel-body">
        <!-- <div id="morris-area-chart"></div>-->
@@ -62,11 +70,12 @@
     <!-- /.panel-body -->
     <hr>
     <footer>
+      <li><a href="/realtime" style="font-size: 17px;">To Real Time</a></li>
+      <h4 style="margin-top: 10px">Group 3| Lan Yao | Aoshuang Wang | Yixuan Huang | Lan Luo</h4>
+      <br>
       <h4>Using Node.js | Socket.io | Express.js | Mongodb</h4>
       <br>
       <a href="#"><h4>Bring Me Back To Top</h4></a>
-      <br>
-      <a href="/realtime" > To Real Time</a>
     </footer>
 
 
@@ -127,7 +136,7 @@
         $("#mycanvas").hide();
       });
 
-      $("#button").click(function(){
+      $("#average").click(function(){
         var starttime = $("#starttime").val();
         var endtime = $("#endtime").val();
         var string1 = "average";
@@ -140,13 +149,17 @@
         $("#mycanvas").hide();
       });
 
-      socket.on("average_draw", function(newString) {
-
-        var g = new Dygraph(document.getElementById("graphdiv"),
-          newString,
-          {
-            labels: [ "Time", "Average Temperature" ]
-          });
+      socket.on("draw", function(newString) {
+        if(newString == "warning"){
+          $("#warning").text("Sorry we do not find data in this period of time," + "\n" +"please re-enter in corrent format!");
+        else{
+	  $("#warning").text("Data has been loaded successfully!");
+          var g = new Dygraph(document.getElementById("graphdiv"),
+            newString,
+            {
+              labels: [ "Time", "Temperature" ]
+            });
+        }
       });
 
     </script>

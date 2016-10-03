@@ -6,6 +6,7 @@ var io = require('socket.io')(http);
 var message;
 
 var flag_start = 0;
+var flag_err = 0;
 var validnum = 0;
 var average = 0;
 var sum = 0;
@@ -68,29 +69,55 @@ function printAve(){
 	//and sum of these temperatures
 	if(validnum == 0){
 		average = 0;
-		io.emit("chat message", "No XBee is working right now.");
+		io.emit('warning', "No XBee is working right now. Please check!");
 	}
 	else{
 		average = (sum / validnum).toFixed(2);
 	}
 	var Temp = "Temperature is " + average;
 	console.log(Temp);
+	var xbee = "";
 	for(var i = 0 ; i < 4; i++){
 		if(flag_update[i] == 0){
-			//console.log("XBee " + (i+1) + " is not responding.");
-			io.emit("chat message", "XBee " + (i+1) + " is not responding.");
+			xbee += "XBee" + (i + 1) + "  ";
+			console.log(xbee + " is not responding.");
+			io.emit('warning', xbee + " is not responding.");
 		}
 	}
-	for(var i = 0; i < 4; i++){
-		//console.log("XBee " + (i+1) + ": " + tempArray[i]);
+	if(flag_update[0]==1 && flag_update[1]==1 && flag_update[2]==1 && flag_update[3]==1 ){
+		io.emit('warning', "No warning right now.");
 	}
+
+	for(var i = 0; i < 4; i++){
+		if(i == 0){
+			data = tempArray[0];
+			io.emit('1', data);
+		}
+
+		if(i == 1){
+			data = tempArray[1];
+			io.emit('2', data);
+		}
+
+		if(i == 2){
+			data = tempArray[2];
+			io.emit('3', data);
+		}
+
+		if(i == 3){
+			data = tempArray[3];
+			io.emit('4', data);
+		}
+	}
+
 	flag_update = [0, 0, 0, 0]; 
-	io.emit("chat message", Temp + " *C now");
+
+	io.emit("average", average);
 
 	var timeNow = getDateTime();
 	var ave_date = new Date();
 	var ave = {
-		"sensor_id" : "average",
+		"sensor_ID" : "average",
 		"temperature" : average,
 		"unit" : "*C",
 		"cal_time" : ave_date.getTime(),
@@ -111,6 +138,7 @@ function printAve(){
 			db.close();
 		});
 	});
+
 	sum = 0;
 	validnum = 0;
 	var t = setTimeout(function(){printAve()}, 2000);
@@ -119,27 +147,17 @@ function printAve(){
 var sp;
 sp = new SerialPort.SerialPort(portName, portConfig);
 
-// app.get('/', function(req, res){
-// 	res.sendfile('index.html');
-// });
-
 app.get('/', function(req, res){
-	res.sendfile('historical.html');
+	res.sendfile('realTime.html');
 });
 
-app.get('/realtime',function(req,res){  
-    res.sendfile('realtime.html');
+app.get('/historical', function(req, res){
+	res.sendfile('historical.html');
 })
 
-// io.on('connection', function(socket){
-// 	console.log('a user connected');
-// 	socket.on('disconnect', function(){
-// 	});
-// 	socket.on('chat message', function(msg){
-// 		io.emit('chat message', msg);
-// 		sp.write(msg + "\n");
-// 	});
-// });
+app.get('/realtime', function(req, res){
+	res.sendfile('realTime.html');
+});
 
 http.listen(3000, function(){
 	console.log('listening on *:3000');
@@ -173,7 +191,7 @@ sp.on("open", function () {
 		var time = getDateTime();
 		var sensor_date = new Date();
 		var sensor = {
-			"sensor_id" : message[0],
+			"sensor_ID" : message[0],
 			"temperature" : message[1],
 			"unit" : "*C",
 			"cal_time" : sensor_date.getTime(),
@@ -206,9 +224,31 @@ io.on('connection', function(socket){
 	socket.on('disconnect', function(){
 	});
 	//this is a private message
+	//for real-time
+	socket.on('average', function(ave){
+		io.emit('average', ave);
+	});
+
+	socket.on('1', function(data){
+		io.emit('1', data);
+	});
+
+	socket.on('2', function(data){
+		io.emit('2', data);
+	});
+
+	socket.on('3', function(data){
+		io.emit('3', data);
+	});
+
+	socket.on('4', function(data){
+		io.emit('4', data);
+	});
+
+	//for historical
 	socket.on('historical', function(msg){
 		var str = null;
-		var str1 = null;
+		var flag_doc = 0;;
 		console.log("Time interval from user: " + msg);
 
 		var findDocuments = function(db, callback) {
@@ -229,21 +269,26 @@ io.on('connection', function(socket){
 
    			
    			if(string[1] != "" && string[2] != ""){
-   				var cursor = db.collection(string[0]).find({"sensor_id":string[3],"cal_time":{$gt:timestamp1,$lt:timestamp2}});
+   				var cursor = db.collection(string[0]).find({"sensor_ID":string[3],"cal_time":{$gt:timestamp1,$lt:timestamp2}});
    			}
    			else{
-   				var cursor =db.collection(string[0]).find({"sensor_id":string[3]});
+   				var cursor =db.collection(string[0]).find({"sensor_ID":string[3]});
    			}
 
    			cursor.each(function(err, doc) {
    				assert.equal(err, null);
    				if (doc != null) {
+   					flag_doc = 1;
    					var d = new Date(parseInt(doc.cal_time));
-         			str=str+d.getFullYear()+"/"+ (d.getMonth()+1)+"/"+d.getDate()+" "+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds()+"," + doc.temperature+"\n";
-   					socket.emit('average_draw',str);
-   					console.log(str);
+         			str=str+d.getFullYear()+"/"+ (d.getMonth()+1)+"/"+d.getDate()+" "+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds()+"," + doc.temperature + "\n";
+   					socket.emit('draw',str);
+   					console.log("str = " + str);
    				} else {
-   					console.log("doc is null");
+   					if(flag_doc == 0){
+   						socket.emit('draw', "warning");
+   						console.log("doc is null");
+   					}
+   					flag_doc = 2;
    					callback();
    				}
    			});

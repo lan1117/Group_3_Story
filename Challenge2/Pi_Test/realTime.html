@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+<head>
+  <title>Real Time Data</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font: 13px Helvetica, Arial; background-color: #f8f8f8; text-align: center;}
+    #mycanvas {margin-top: 70px; }
+    h1 {margin-top:10px;font-size: 34px;}
+    h2 {margin-top:40px;}
+    #one{color:rgb(0 , 255 , 0);}
+    /*#graphdiv{margin-left: 50px;width:200px; height:200px ;}*/
+    hr {width:700px; margin-top:200px;}
+    footer {font-family: Arial; margin-top:20px;margin-bottom:100px;}
+    #value_group {margin-top:120px; margin-bottom: 300px; float: right; margin-right: 280px}
+    #header1{background: rgb();padding-top: 30px; margin-bottom: 30px}
+  }
+</style>
+<script src= "https://cdnjs.cloudflare.com/ajax/libs/smoothie/1.27.0/smoothie.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/dygraph/1.1.1/dygraph-combined-dev.js"></script> -->
+<!-- <script src="/public/smoothie.js"></script> -->
+<!-- <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script> -->
+<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+</head>
+<body>
+  <div id="header1">
+    <h1>Real Time Temperature Graph</h1>
+    <div style="padding-top: 25px">
+      <label id="warning" style="color: red; font-size: 20px;">If data becomes abnormal,
+        <br>please pay attention to warnings!</label>
+      </div>
+    </div>
+    <div style="vertical-align: middle;"><span style="float: left;margin-left: 300px">
+    <canvas id="mycanvas" width="600" height="500"></canvas></span>
+    <span id="value_group">
+      <h2 id = "val_one"> </h2>
+      <h2 id = "val_two"> </h2>
+      <h2 id = "val_three"> </h2>
+      <h2 id = "val_four"> </h2>
+      <h2 id = "val_ave"> </h2>
+    </span>
+    </div>
+    <br>
+    <div style="padding-left: 280px">
+    <hr>
+    <footer>
+      <a href = "/historical" style="font-size: 17px;"> To Historical</a>
+      <h4 style="margin-top: 10px">Group 3| Lan Yao | Aoshuang Wang | Yixuan Huang | Lan Luo </h4>
+      <br>
+      <h4>Using Node.js | Socket.io | Express.js | Mongodb</h4>
+    </footer>
+    </div>
+
+   <!--  //----------------------Real Time Graph-------------------------// -->
+    <script>
+      var socket = io();
+
+      var smoothie = new SmoothieChart( {
+        grid: { strokeStyle:'rgb(125, 0, 0)', fillStyle:'rgb(60, 0, 0)',
+        lineWidth: 1, millisPerLine: 2000, verticalSections: 6, },
+        minValue:10,
+        maxValue:40,
+        interpolation:"bezier",
+        labels: { fillStyle:'rgb(255, 255, 255)' },
+        sharpLines:true,
+        labels:{fontSize:15},
+        horizontalLines:{color:'#ffff6f',lineWidth:1,value:0},
+        timestampFormatter:SmoothieChart.timeFormatter
+      });
+
+      var lineA = new TimeSeries();
+      var lineB = new TimeSeries();
+      var lineC = new TimeSeries();
+      var lineD = new TimeSeries();
+      var lineE = new TimeSeries();
+
+      smoothie.addTimeSeries(lineA, { strokeStyle:'rgb(255 , 255 , 255)', lineWidth:3 });
+      smoothie.addTimeSeries(lineB, { strokeStyle:'rgb(0 ,255 , 0)', lineWidth:3 });
+      smoothie.addTimeSeries(lineC, { strokeStyle:'rgb(0 ,0 , 255)', lineWidth:3 });
+      smoothie.addTimeSeries(lineD, { strokeStyle:'rgb(255 ,255 , 0)',  lineWidth:3 });
+      smoothie.addTimeSeries(lineE, { strokeStyle:'rgb(255 ,0 , 0)', lineWidth:3});
+      smoothie.streamTo(document.getElementById("mycanvas"), 2500 /*delay*/);
+
+      socket.on('1', function(data) {
+        lineA.append(new Date().getTime(),data);
+        $(document.getElementById('val_one')).text("sensor 1 (white): " + data + "*C");
+      });
+
+      socket.on('2', function(data) {
+        lineB.append(new Date().getTime(),data);
+        $(document.getElementById('val_two')).text("sensor 2 (green): " + '\t' + data + "*C");
+      });
+
+      socket.on('3', function(data) {
+        lineC.append(new Date().getTime(),data);
+        $(document.getElementById('val_three')).text("sensor 3 (blue): " + '\t' + data + "*C");
+      });
+
+      socket.on('4', function(data) {
+        lineD.append(new Date().getTime(),data);
+        $(document.getElementById('val_four')).text("sensor 4 (yellow): " + '\t' + data + "*C");
+      });
+
+      socket.on('average', function(ave){
+        lineE.append(new Date().getTime(), ave);
+        $(document.getElementById('val_ave')).text("average (red): " + '\t' + ave + "*C");
+      });
+
+      socket.on('warning', function(err){
+        $("#warning").text(err);
+      }); 
+
+    </script>
+  </body>
+  </html>

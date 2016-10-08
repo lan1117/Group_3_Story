@@ -12,22 +12,15 @@ portConfig = {
 
 var sp;
 var LEDStatus = "0000";
-
 sp = new SerialPort.SerialPort(portName, portConfig);
 
 app.get('/', function(req, res){
-  res.sendfile('index.html');
+  res.sendfile('LED_Control.html');
 });
 
-app.use('/Button', express.static(__dirname + '/Button'));
 app.use('/Style', express.static(__dirname + '/Style'));
-
 app.get('/style.css',function(req, res){
   res.sendfile('style.css');
-});
-
-app.get('/buttons.css',function(req, res){
-  res.sendfile('buttons.css');
 });
 
 io.on('connection', function(socket){

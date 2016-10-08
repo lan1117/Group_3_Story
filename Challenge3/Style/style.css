@@ -1,0 +1,18 @@
+/*
+	StyleSheet by David Herreman
+	http://www.free-css-templates.com
+		
+*/
+@media screen and (max-width: 800px) {
+  #container, #header, #content, #footer {
+    float: none;
+    width: auto;
+  }
+}
+body { 
+	background: #000000 url(images/img2.gif) no-repeat center top;
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	text-align: justify;
+	color: #888888;
+	}

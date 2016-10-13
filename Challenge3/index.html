@@ -1,89 +1,82 @@
-<!DOCTYPE html>
 <html>
-<link rel="stylesheet" type="text/css" href="Style/style.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="Button/buttons.css" media="screen" />
-<style type = "text/css">
-body{
-	background: #000000 url(images/img2.gif) no-repeat center top;
-	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-	font-size: 11px;
-	text-align: justify;
-	color: #888888;
-}
-button{
-	font-size: 10px;
-	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-	width: 40px;
-	hight: 20px;
-}
-div.LED1{
-	position: absolute;
-	top: 50%;
-	left: 10%;
-	width: 20%;
-	height: 20%;
-	border-radius:9px;
-}
-div.LED2{
-	position: absolute;
-	top: 50%;
-	left: 30%;
-	width: 20%;
-	height: 20%;
-			border-radius:9px;
-}
-div.LED3{
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	width: 20%;
-	height: 20%;
-	border-radius:9px;
-}
-div.LED4{
-	position: absolute;
-	top: 50%;
-	left: 70%;
-	width: 20%;
-	height: 20%;
-	border-radius:9px;
-}
-
-</style>
-<body onLoad = "getStat()">
-
 <head>
+	<title>Remote LED Control</title>
+	<link rel="stylesheet" type="text/css" href="Style/style.css" media="screen" />
+	<link rel="stylesheet" type="text/css" href="Button/buttons.css" media="screen" />
+	<style type="text/css">
+		div.LED1 {
+		    position: absolute;
+		    top: 20%;
+		    left: 10%;
+		    width: 35%;
+		    height: 35%;
+		    background-color:rgba(0,0,0,0.5);
+						border-radius:9px;
+		}
+		div.LED2 {
+		    position: absolute;
+		    top: 20%;
+		    left: 53%;
+		    width: 35%;
+		    height: 35%;
+		    background-color:rgba(0,0,0,0.5);
+						border-radius:9px;
+		}
+		div.LED3 {
+		    position: absolute;
+		    top: 60%;
+		    left: 10%;
+		    width: 35%;
+		    height: 35%;
+		    background-color:rgba(0,0,0,0.5);
+						border-radius:9px;
+		}
+		div.LED4 {
+		    position: absolute;
+		    top: 60%;
+		    left: 53%;
+		    width: 35%;
+		    height: 35%;
+		    background-color:rgba(0,0,0,0.5);
+						border-radius:9px;
+		}
+	</style>
+</head>
+<body onLoad="getStat()">
+<div style="background-color:rgba(0,0,0,0.5); height:90px; font-size:18px; font-family:Arial, Helvetica, sans-serif; color:rgba(255,255,255,1)">
+  <h1 align="middle">Group 2</h1>
+</div>
+<div class="content">
 
-</head><br><br><br><br>
-
-<center>
-<h1>Group 3<br>Challenge3</h1>
-<h2 style="font-size:50px">LED Controller</h2>
-
-<br><br>
-<p></p>
 <div class="LED1">
+	<h3 align="middle" 	style="font-size:3.0vh; margin-top:3%; color:rgba(255,255,255,1)">LED1</h3>
+	<img id="myBulb1" onload="initBulb('myBulb1',1)" src="Style/bulbon.gif" height="55%" style=" position: absolute; margin: auto; top: 0; left: 0; right: 0; bottom: 0">
+	<button onClick="onBulb('myBulb1', 1); getStat();" style="display:block; font-weight:bold;font-size:1.8vh; text-align: middle; position: absolute; top:85%; left: 20%" class="pure-button pure-button-primary" align ="top">on</button>
+	<button onClick="offBulb('myBulb1', 1); getStat();" style="display:block; font-weight:bold;font-size:1.8vh; text-align: middle; position: absolute; top:85%; right: 20%" class="pure-button" align ="top">off</button>
+</div>
 
-   <img id="myBulb1" onload = "initBulb('myBulb1', 1)" src="images/1.png" style="width:130px"><br>
-   <button onclick="onBulb('myBulb1', 1)">On</button>
-   <button onclick="offBulb('myBulb1', 1)">Off</button>
-</div>
 <div class="LED2">
-    <img id="myBulb2" onload = "initBulb('myBulb2', 2)" src="images/1.png" style="width:130px"><br>
-    <button onclick="onBulb('myBulb2', 2)">On</button>
-    <button onclick="offBulb('myBulb2', 2)">Off</button>
+	<h3 align="middle" 	style="font-size:3.0vh; margin-top:3%; color:rgba(255,255,255,1)">LED2</h3>
+	<img id="myBulb2" onload="initBulb('myBulb2',2)" src="Style/bulbon.gif" height="55%" style=" position: absolute; margin: auto; top: 0; left: 0; right: 0; bottom: 0">
+	<button onClick="onBulb('myBulb2', 2); getStat();" style="display:block; font-weight:bold; font-size:1.8vh; text-align: middle; position: absolute; top:85%; left: 20%" class="pure-button pure-button-primary" align ="top">on</button>
+	<button onClick="offBulb('myBulb2', 2); getStat();" style="display:block; font-weight:bold;font-size:1.8vh; text-align: middle; position: absolute; top:85%; right: 20%" class="pure-button" align ="top">off</button>
 </div>
+
 <div class="LED3">
-    <img id="myBulb3" onload = "initBulb('myBulb3', 3)" src="images/1.png" style="width:130px"><br>
-    <button onclick="onBulb('myBulb3', 3)">On</button>
-    <button onclick="offBulb('myBulb3', 3)">Off</button>
+	<h3 align="middle" 	style="font-size:3.0vh; margin-top:3%; color:rgba(255,255,255,1)">LED3</h3>
+	<img id="myBulb3" onload="initBulb('myBulb3',3)" src="Style/bulbon.gif" height="55%" style=" position: absolute; margin: auto; top: 0; left: 0; right: 0; bottom: 0">
+	<button onClick="onBulb('myBulb3', 3); getStat();" style="display:block; font-weight:bold; font-size:1.8vh; text-align: middle; position: absolute; top:85%; left: 20%" class="pure-button pure-button-primary" align ="top">on</button>
+	<button onClick="offBulb('myBulb3', 3); getStat();" style="display:block; font-weight:bold;font-size:1.8vh; text-align: middle; position: absolute; top:85%; right: 20%" class="pure-button" align ="top">off</button>
 </div>
+
 <div class="LED4">
-   <img id="myBulb4" onload = "initBulb('myBulb4', 4)" src="images/1.png" style="width:130px"><br>
-   <button onclick="onBulb('myBulb4', 4)">On</button>
-   <button onclick="offBulb('myBulb4', 4)">Off</button>
- </div>
-<script src = "/socket.io/socket.io.js"></script>
+	<h3 align="middle" 	style="font-size:3.0vh; margin-top:3%; color:rgba(255,255,255,1)">LED4</h3>
+	<img id="myBulb4" onload="initBulb('myBulb',4)" src="Style/bulbon.gif" height="55%" style=" position: absolute; margin: auto; top: 0; left: 0; right: 0; bottom: 0">
+	<button onClick="onBulb('myBulb4', 4); getStat();" style="display:block; font-weight:bold; font-size:1.8vh; text-align: middle; position: absolute; top:85%; left: 20%" class="pure-button pure-button-primary" align ="top">on</button>
+	<button onClick="offBulb('myBulb4', 4); getStat();" style="display:block; font-weight:bold;font-size:1.8vh; text-align: middle; position: absolute; top:85%; right: 20%" class="pure-button" align ="top">off</button>
+</div>
+</div>
+<script src="/socket.io/socket.io.js"></script>
 <script>
   var socket = io();
 </script>
@@ -91,12 +84,20 @@ div.LED4{
 <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
 
 <script>
-	var bStates = [0, 0, 0, 0];
+	var bStates = [0,0,0,0];
+	var sendStates = [0, 0, 0, 0];
 	socket.on('updated bStates', function(msg){
 		bStates[0] = parseInt(msg.charAt(0));
 		bStates[1] = parseInt(msg.charAt(1));
 		bStates[2] = parseInt(msg.charAt(2));
 		bStates[3] = parseInt(msg.charAt(3));
+		//getStat();
+	});
+	socket.on('updated bStates', function(receivedStatus){
+		sendStates[0] = parseInt(receivedStatus.charAt(0));
+		sendStates[1] = parseInt(receivedStatus.charAt(1));
+		sendStates[2] = parseInt(receivedStatus.charAt(2));
+		sendStates[3] = parseInt(receivedStatus.charAt(3));
 		getStat();
 	});
 
@@ -105,29 +106,25 @@ div.LED4{
 		var image2 = document.getElementById('myBulb2');
 		var image3 = document.getElementById('myBulb3');
 		var image4 = document.getElementById('myBulb4');
-		if(bStates[0] == 0){image1.src = "images/1.png";} else {image1.src = "images/2.png";}
-		if(bStates[1] == 0){image2.src = "images/1.png";} else {image2.src = "images/2.png";}
-		if(bStates[2] == 0){image3.src = "images/1.png";} else {image3.src = "images/2.png";}
-		if(bStates[3] == 0){image4.src = "images/1.png";} else {image4.src = "images/2.png";}
+		if(sendStates[0] == 0){image1.src = "Style/bulboff.gif";} else {image1.src = "Style/bulbon.gif";}
+		if(sendStates[1] == 0){image2.src = "Style/bulboff.gif";} else {image2.src = "Style/bulbon.gif";}
+		if(sendStates[2] == 0){image3.src = "Style/bulboff.gif";} else {image3.src = "Style/bulbon.gif";}
+		if(sendStates[3] == 0){image4.src = "Style/bulboff.gif";} else {image4.src = "Style/bulbon.gif";}
 	}
 	function onBulb(bulb,num){
 		var image = document.getElementById(bulb);
-		if(image.src = "images/2.png"){
-			image.src = "images/2.png";
-			bStates[num-1] = 1;
-			socket.emit('bStates', bStates.toString().replace(/,/g, ''));//repalce all , to none
-		}
-	}
 
+			bStates[num-1] = 1;
+			socket.emit('bStates', bStates.toString().replace(/,/g, ''));
+
+	}
 	function offBulb (bulb,num) {
 		var image = document.getElementById(bulb);
-		if(image.src = "images/2.png"){
-			image.src = "images/1.png";
+
 			bStates[num-1] = 0;
 			socket.emit('bStates', bStates.toString().replace(/,/g, ''));
-		}
+
 	}
 </script>
-</center>
 </body>
 </html>

@@ -15,7 +15,7 @@ var LEDStatus = "0000";
 sp = new SerialPort.SerialPort(portName, portConfig);
 
 app.get('/', function(req, res){
-  res.sendfile('LED_Control.html');
+  res.sendfile('index.html');
 });
 
 app.use('/Style', express.static(__dirname + '/Style'));
@@ -29,13 +29,16 @@ io.on('connection', function(socket){
   socket.on('disconnect', function(){
     console.log('client disconnected');
   });
-  socket.on('bStates', function(msg){
+  socket.on('updated bStates', function(msg){
     LEDStatus = msg;
     sp.write(msg + "\n");
     console.log('message: ' + msg); // + msg
     io.emit('updated bStates', msg);
   });
-
+  /*socket.on('state', function(s){
+    sp.write(s);
+    console.log(s);
+  });*/
 });
 
 http.listen(3000, function(){
@@ -45,8 +48,13 @@ http.listen(3000, function(){
 sp.on("open", function () {
   console.log('open');
   sp.on('data', function(receivedStatus) {
-      io.emit('upbStates', receivedStatus);
-      console.log('received: ' + receivedStatus);
-      LEDStatus = receivedStatus;
+
+        io.emit('states', receivedStatus);
+        console.log('received: ' + receivedStatus);
+        LEDStatus = receivedStatus;
+
+    //  io.emit('updated bStates', receivedStatus);
+    //  console.log('received: ' + receivedStatus);
+    //  LEDStatus = receivedStatus;
   });
 });

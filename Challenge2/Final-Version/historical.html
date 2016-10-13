@@ -1,0 +1,167 @@
+<!doctype html>
+<html>
+<head>
+  <title>Historical Data</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font: 13px Helvetica, Arial; background-color: #f8f8f8;text-align: center;}
+    h1 {margin-top:10px;font-size: 34px;}
+    #mycanvas {margin-top: 100px;}
+    .buttons {margin-top:20px;text-align:center; margin-left: auto; margin-right: auto;margin-bottom:30px;width:70px; height:28px;color:black;font-size:14px;}
+    #graphdiv{width:1000px; height:400px ;}
+    #header1{background: rgb();padding-top: 30px; margin-bottom: 20px}
+    hr {width:700px; margin-top:100px;}
+    footer {font-family: Arial; margin-top:20px;margin-bottom:100px;}
+  </style>
+  <!-- Bootstrap Core CSS -->
+  <link href="bootstrap.min.css" rel="stylesheet">
+
+  <!-- MetisMenu CSS -->
+  <link href="metisMenu.css" rel="stylesheet">
+
+  <!-- Timeline CSS -->
+  <link href="timeline.css" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link href="sb-admin-2.css" rel="stylesheet">
+
+  <!-- Custom Fonts -->
+  <link href="font-awesome.min.css" rel="stylesheet" type="text/css">
+
+  <script src= "https://cdnjs.cloudflare.com/ajax/libs/smoothie/1.27.0/smoothie.min.js"></script>
+  <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+  <script src="jquery.min.js"></script>
+  <script src="http://smoothiecharts.org/smoothie.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="smoothie.js"></script>
+  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dygraph/1.1.1/dygraph-combined-dev.js"></script>
+  <script src="main.js"></script>
+</head>
+<body>
+  <div id="header1">
+    <h1>Historical Temperature Graph</h1>
+    <div style="padding-top: 15px">
+      <label id="warning" style="color: red; font-size: 20px;">Please pay attention to input format!
+	<br>If your input is not complete, we will provide all data for you.</label>
+    </div>
+  </div>
+
+  <div>
+    <a><i class="fa fa-bar-chart-o fa-fw" style="font-size:14px"></i>
+      Start Time: <input type="text" id="starttime" class="form-control" placeholder="Format:yy/mm/dd/hh/min"></a>
+      <a><i class="fa fa-bar-chart-o fa-fw" style="padding-left: 50px;font-size:14px"></i>
+       End Time: <input type="text" id="endtime" class="form-control" placeholder="Format:yy/mm/dd/hh/min"><br></a>
+     </div>
+
+     <button class = "buttons" id = "average" type="button">Average</button>&nbsp;&nbsp;&nbsp;
+     <button class = "buttons" id = "sensor1" type="button">Sensor 1</button>&nbsp;&nbsp;&nbsp;
+     <button class = "buttons" id = "sensor2" type="button">Sensor 2</button>&nbsp;&nbsp;&nbsp;
+     <button class = "buttons" id = "sensor3" type="button">Sensor 3</button>&nbsp;&nbsp;&nbsp;
+     <button class = "buttons" id = "sensor4" type="button">Sensor 4</button>
+     <!-- /.panel-heading -->
+     <div class="panel-body">
+       <!-- <div id="morris-area-chart"></div>-->
+       <canvas id="mycanvas" width="500" height="400"></canvas>
+       <div id="dy">
+        <div id="graphdiv"></div>
+      </div>
+    </div>
+    <!-- /.panel-body -->
+    <hr>
+    <footer>
+      <li><a href="/realtime" style="font-size: 17px;">To Real Time</a></li>
+      <h4 style="margin-top: 10px">Group 3| Lan Yao | Aoshuang Wang | Yixuan Huang | Lan Luo</h4>
+      <br>
+      <h4>Using Node.js | Socket.io | Express.js | Mongodb</h4>
+      <br>
+      <a href="#"><h4>Bring Me Back To Top</h4></a>
+    </footer>
+
+
+    <!--  -------------Historical Graph------------- -->
+
+    <script>
+      var socket = io();
+
+      $("#sensor1").click(function(){
+        var starttime = $("#starttime").val();
+        var endtime = $("#endtime").val();
+        var string1 = "Temp_1";
+        var string2 = ",";
+        string= string1.concat(string2,starttime,string2,endtime,string2,"1");
+        socket.emit("historical",string);
+        $("#dy").find('div:contains(someText)').remove();
+        var tag  = '<div id="graphdiv"></div>'
+        $("#dy").append(tag);
+        $("#mycanvas").hide();
+      });
+
+      $("#sensor2").click(function(){
+        var starttime = $("#starttime").val();
+        var endtime = $("#endtime").val();
+        var string1 = "Temp_2";
+        var string2 = ",";
+        string= string1.concat(string2,starttime,string2,endtime,string2,"2");
+        socket.emit("historical",string);
+        $("#dy").find('div:contains(someText)').remove();
+        var tag  = '<div id="graphdiv"></div>'
+        $("#dy").append(tag);
+        $("#mycanvas").hide();
+      });
+
+      $("#sensor3").click(function(){
+        var starttime = $("#starttime").val();
+        var endtime = $("#endtime").val();
+        var string1 = "Temp_3";
+        var string2 = ",";
+        string= string1.concat(string2,starttime,string2,endtime,string2,"3");
+        socket.emit("historical",string);
+        $("#dy").find('div:contains(someText)').remove();
+        var tag  = '<div id="graphdiv"></div>'
+        $("#dy").append(tag);
+        $("#mycanvas").hide();
+      });
+
+      $("#sensor4").click(function(){
+        var starttime = $("#starttime").val();
+        var endtime = $("#endtime").val();
+        var string1 = "Temp_4";
+        var string2 = ",";
+        string= string1.concat(string2,starttime,string2,endtime,string2,"4");
+        socket.emit("historical",string);
+        $("#dy").find('div:contains(someText)').remove();
+        var tag  = '<div id="graphdiv"></div>'
+        $("#dy").append(tag);
+        $("#mycanvas").hide();
+      });
+
+      $("#average").click(function(){
+        var starttime = $("#starttime").val();
+        var endtime = $("#endtime").val();
+        var string1 = "average";
+        var string2 = ",";
+        string= string1.concat(string2,starttime,string2,endtime,string2,string1);
+        socket.emit("historical",string);
+        $("#dy").find('div:contains(someText)').remove();
+        var tag  = '<div id="graphdiv"></div>'
+        $("#dy").append(tag);
+        $("#mycanvas").hide();
+      });
+
+      socket.on("draw", function(newString) {
+        if(newString == "warning"){
+          $("#warning").text("Sorry we do not find data in this period of time," + "\n" +"please re-enter in corrent format!");
+        else{
+	  $("#warning").text("Data has been loaded successfully!");
+          var g = new Dygraph(document.getElementById("graphdiv"),
+            newString,
+            {
+              labels: [ "Time", "Temperature" ]
+            });
+        }
+      });
+
+    </script>
+  </body>
+  </html>

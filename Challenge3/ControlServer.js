@@ -35,6 +35,7 @@ io.on('connection', function(socket){
     console.log('message: ' + msg); // + msg
     io.emit('updated bStates', msg);
   });
+
 });
 
 http.listen(3000, function(){
@@ -44,7 +45,7 @@ http.listen(3000, function(){
 sp.on("open", function () {
   console.log('open');
   sp.on('data', function(receivedStatus) {
-      io.emit('updated bStates', receivedStatus);
+      io.emit('upbStates', receivedStatus);
       console.log('received: ' + receivedStatus);
       LEDStatus = receivedStatus;
   });

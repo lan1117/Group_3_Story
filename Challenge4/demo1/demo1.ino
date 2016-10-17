@@ -6,7 +6,7 @@ const double BETA = 3950;
 
 const double THERMISTOR_RES = 10000;
 
-const double THERMISTOR_NOM_TEMP = 25;
+const double THERMISTOR_NOM_TEMP = 20;
 
 void setup()
 {
@@ -23,13 +23,13 @@ void thermister_temp(int aval)
 {
     double R, T;
     
-    R = (double) PULLUP_RES / ( ( (1023) / (double) aval ) - 1 );
+    R = (double) PULLUP_RES / ( 4950 /( (double) aval )   - 1 ) ;
     
     T = 1 / ( ( 1 / (THERMISTOR_NOM_TEMP + 273.15)) + ( ( 1/ BETA) * log(R / THERMISTOR_RES) ) );
     
     T -= 273.15;
-    
-    //Spark.publish("Temperature", String(T) + " *C");
+    //Particle.publish("analog", String(aval) + " *C", PRIVATE);
+   
     Particle.publish("Temp_P3", String(T) + " *C", PRIVATE);
 }
 

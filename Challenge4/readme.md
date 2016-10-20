@@ -6,5 +6,5 @@ thingspeak.md stores write API key, read API key, and channel that we use for st
 
 particle.zip contains every file that we used to run this challenge.
 
-We used particle-logger to store data recieved from phothon to MongoDB.
+We used particle-logger to store data recieved from photon to MongoDB.
 Reference:https://github.com/suyashkumar/particle-logger

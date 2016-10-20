@@ -4,9 +4,9 @@ const int PULLUP_RES = 9100;
 
 const double BETA = 3950;
 
-const double THERMISTOR_RES = 100000;
+const double THERMISTOR_RES = 9000;
 
-const double THERMISTOR_NOM_TEMP = 25;
+const double THERMISTOR_NOM_TEMP = 20;
 
 void setup()
 {
@@ -31,6 +31,7 @@ void thermister_temp(int aval)
     
     //Spark.publish("Temperature", String(T) + " *C");
     Particle.publish("Temp_P3", String(T) + " *C", PRIVATE);
+    Particle.publish("Temp_P3", "3" + String(T), PRIVATE);
 }
 
 void myHandler(const char *event, const char *data) {

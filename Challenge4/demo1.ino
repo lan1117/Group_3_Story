@@ -4,7 +4,7 @@ const int PULLUP_RES = 9100;
 
 const double BETA = 3950;
 
-const double THERMISTOR_RES = 10000;
+const double THERMISTOR_RES = 100000;
 
 const double THERMISTOR_NOM_TEMP = 25;
 
@@ -16,14 +16,14 @@ void setup()
 void loop()
 {
     thermister_temp(analogRead(3));
-    delay(1000);
+    delay(10000);
 }
 
 void thermister_temp(int aval)
 {
     double R, T;
     
-    R = (double) PULLUP_RES / ( ( (1023) / (double) aval ) - 1 );
+    R = (double) PULLUP_RES / ( ( (4950) / (double) aval ) - 1 );
     
     T = 1 / ( ( 1 / (THERMISTOR_NOM_TEMP + 273.15)) + ( ( 1/ BETA) * log(R / THERMISTOR_RES) ) );
     

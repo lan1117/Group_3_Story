@@ -80,13 +80,6 @@
     sparkSetPos(newValue);
   }
 
-  function fineAdjust(value) {
-    var currentValue = parseInt(document.getElementById('curesc').innerHTML);
-    var setValue = value + currentValue;
-    sparkSetPos(setValue);
-    document.getElementById("degBoxId").value = setValue;
-  }
-
   function sparkSetPos(newValue) {
 var requestURL = "https://api.spark.io/v1/devices/" +deviceID + "/" + setFunc + "/";
     $.post( requestURL, { params: newValue, access_token: accessToken });

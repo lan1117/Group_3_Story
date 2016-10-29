@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <title>Speed Control</title>
+
+
+
+      <link rel="stylesheet" href="css/style.css">
+
+
+</head>
+
+<body>
+  <h1>Challenge 5 : Speed Control</h1>
+
+<div class="knob-surround">
+
+  <div class="knob"></div>
+
+  <span class="min">Stop</span>
+  <span class="max">Fast</span>
+
+  <div class="ticks">
+    <div class="tick activetick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+  </div>
+
+</div>
+
+<p>Group 3</p>
+<p>Target Speed : <span class="current-value" id='taresc'></span></p>
+<p>Current Speed : <span class="current-value" id='curesc'></span></p>
+  <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+   <script src="js/index.js"></script>
+  <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'>
+    </script>
+  <script type="text/javascript">
+  var deviceID    = "270028001847353236343033";
+  var accessToken = "6ea0af554732fcc2f979e663c468f724e68eb3b0";
+  var setFunc = "setesc";
+  var getFunc = "getesc";
+
+  window.setInterval(function() {
+    requestURL = "https://api.spark.io/v1/devices/" + deviceID + "/" + getFunc + "/?access_token=" + accessToken;
+    $.getJSON(requestURL, function(json) {
+             document.getElementById("curesc").innerHTML = json.result + "&deg;";
+             document.getElementById("curesc").value = parseInt(json.result);
+             });
+  }, 1000);
+
+  function setValue(obj) {
+    var newValue = document.getElementById('taresc').value;
+    sparkSetPos(newValue);
+  }
+
+  function fineAdjust(value) {
+    var currentValue = parseInt(document.getElementById('curesc').innerHTML);
+    var setValue = value + currentValue;
+    sparkSetPos(setValue);
+    document.getElementById("degBoxId").value = setValue;
+  }
+
+  function sparkSetPos(newValue) {
+var requestURL = "https://api.spark.io/v1/devices/" +deviceID + "/" + setFunc + "/";
+    $.post( requestURL, { params: newValue, access_token: accessToken });
+  }
+
+</script>
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+References
+
+Lidarlite: https://github.com/PulsedLight3D/LIDARLite_Basics
+PID: http://playground.arduino.cc/Code/PIDLibrary
+	 https://github.com/br3ttb/Arduino-PID-Library
+	 http://brettbeauregard.com/blog/2011/04/improving-the-beginner%E2%80%99s-pid-sample-time/
+   
+Photon & Nodejs: https://www.hackster.io/makers-ns/photon-nodejs-e48cf3
+                 https://docs.particle.io/reference/firmware/photon/#particle-variable-

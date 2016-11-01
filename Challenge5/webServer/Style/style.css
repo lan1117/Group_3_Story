@@ -1,0 +1,21 @@
+/*
+	StyleSheet by David Herreman
+	http://www.free-css-templates.com
+		
+*/
+@media screen and (max-width: 800px) {
+  #container, #header, #content, #footer {
+    float: none;
+    width: auto;
+  }
+}
+body { 
+	margin-top: 50px; 
+	margin: 0; 
+	font: .74em Arial, sans-serif; 
+	line-height: 1.5em; 
+	background: #181818 url(images/top.jpg) no-repeat top; 
+	background-position: center;
+	color: #ffffff; 
+	text-align: center;
+	}

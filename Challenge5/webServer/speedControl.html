@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<link rel="stylesheet" type="text/css" href="Style/style.css" media="screen" />
+<!-- <link rel="stylesheet" type="text/css" href="Button/buttons.css" media="screen" /> -->
+<style type = "text/css">
+/*body{
+	background: #000000 url(images/img2.gif) no-repeat center top;
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	text-align: justify;
+	color: #888888;
+}*/
+button{
+	font-size: 10px;
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+	width: 80px;
+	height: : 20px;
+}
+div.speed1{
+	position: absolute;
+	top: 55%;
+	left: 15%;
+	width: 20%;
+	height: 20%;
+	border-radius:9px;
+}
+div.speed2{
+	position: absolute;
+	top: 55%;
+	left: 40%;
+	width: 20%;
+	height: 20%;
+	border-radius:9px;
+}
+div.speed3{
+	position: absolute;
+	top: 55%;
+	left: 65%;
+	width: 20%;
+	height: 20%;
+	border-radius:9px;
+}
+
+</style>
+<body>
+
+<head>
+<title>Speed Control</title>
+
+</head><br><br><br>
+
+<center>
+<h1 style="font-size: 30px; text-shadow: 5px 5px 5px #FF0000;">Group 3<br><br>Challenge5</h1>
+<h2 style="font-size:50px; text-shadow: 5px 5px 5px #FF0000;">Car Controller</h2>
+
+<br><br>
+<p></p>
+<h1>Current Speed </h1>
+<label id="Current" style="color: #FFFF00; font-size: 20px;">0</label>
+<div>
+<div class="speed1">
+   <img id="stop" src="Style/stop.png" style="width:180px"><br>
+   <button style="font-size: 18px" onclick="setSpeed('stop', 90)">Stop!</button>
+</div>
+<div class="speed2">
+    <img id="mid" src="Style/mid.png" style="width:180px"><br>
+    <button style="font-size: 18px" onclick="setSpeed('mid', 60)">Set Go!</button>
+</div>
+<div class="speed3">
+    <img id="fast" src="Style/fast.png" style="width:180px"><br>
+    <button style="font-size: 18px" onclick="setSpeed('fast', 25)">Set Go!</button>
+</div>
+</div>
+
+    <footer style="margin-top: 250px; font-size: 14px">
+      <h4 style="margin-top: 10px">Group 3| Lan Yao | Aoshuang Wang | Yixuan Huang | Lan Luo</h4>
+      <h4>Using Node.js | Socket.io | Particle Cloud | Photon | Sensors</h4>
+      <br>
+    </footer>
+
+<script src = "/socket.io/socket.io.js"></script>
+<script>
+  var socket = io();
+</script>
+<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+
+<script>
+	var curSpeed = 0;
+	socket.on('display', function(msg){
+			curSpeed = msg;
+			getSpeed(curSpeed);
+	});
+	function getSpeed(speed){
+		$("#Current").text(speed);
+	}
+
+	// $("#stop").click(function(){
+	// 	socket.emit('speed', 90);
+ //    });
+
+	function setSpeed(speed,num){
+		socket.emit('speed', num);
+	}
+</script>
+</center>
+</body>
+</html>

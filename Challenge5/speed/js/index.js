@@ -1,6 +1,6 @@
 
 var knob = $('.knob');
-var angle = 135;
+var angle = 0;
 var minangle = 0;
 var maxangle = 270;
 function moveKnob(direction) {

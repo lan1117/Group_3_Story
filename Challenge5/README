@@ -14,11 +14,10 @@ On server side, we designed a IOS application as well as a web site to get data 
 Description
 
 IOSApplication folder includes source codes and other resources of our remote car control application.
-
 Lidar folder includes source code that we used to get distance using lidar.
-
+lidar-pid folder includes source code that added PID control.
 Speed folder is one of the website template that we planned to use as the web server.
-
+speedsensor folder includes source code that we used to test rotary encoder.
 webServer folder includes files and details we finally used as our website.
 
 References

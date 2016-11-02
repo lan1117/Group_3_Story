@@ -1,3 +1,26 @@
+Challenge5 -- Steering the Car
+
+In this challenge, we have designed a program to let the crawler runs in a straight line without hitting the wall.
+
+Photon is used as main controller chip.
+Lidarlite is used to left/right distance between the car and the wall.
+Sonar is used to detect barrier in front of the car.
+Rotary Encoder is used to calculate wheel speed.
+
+PID controlling method is implemented in program to adjust turning angle of wheels.
+
+On server side, we designed a IOS application as well as a web site to get data from particle cloud and send speed control command back to photon.
+
+Description
+
+IOSApplication folder includes source codes and other resources of our remote car control application.
+
+Lidar folder includes source code that we used to get distance using lidar.
+
+Speed folder is one of the website template that we planned to use as the web server.
+
+webServer folder includes files and details we finally used as our website.
+
 References
 
 Lidarlite: https://github.com/PulsedLight3D/LIDARLite_Basics
@@ -7,3 +30,5 @@ PID: http://playground.arduino.cc/Code/PIDLibrary
    
 Photon & Nodejs: https://www.hackster.io/makers-ns/photon-nodejs-e48cf3
                  https://docs.particle.io/reference/firmware/photon/#particle-variable-
+
+Rotary Encoder: http://recreationalrobotics.blogspot.com/search?q=cny70

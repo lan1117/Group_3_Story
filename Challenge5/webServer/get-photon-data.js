@@ -21,7 +21,7 @@ var particle = new Particle();
 particle.login({username: 'lanyao1117@163.com', password: 'Yaolan126126'});
 
 var token = '6ea0af554732fcc2f979e663c468f724e68eb3b0';
-var d_uid = '230044001547353236343033';
+var d_uid = '270028001847353236343033';
 var timer;
 var cmd = "";//initialize cmd
 

@@ -1,6 +1,15 @@
 var SerialPort = require("serialport");
 var app = require('express')();
 var xbee_api = require('xbee-api');
+var csvWriter = require('csv-write-stream');
+var fs = require('fs');
+var writer = csvWriter();
+writer.pipe(fs.createWriteStream('out.csv'));
+
+var i = 1;
+var j = 1;
+var m = 1;
+var n = 1;
 
 var C = xbee_api.constants;
 var XBeeAPI = new xbee_api.XBeeAPI({
@@ -88,6 +97,7 @@ var RSSIRequestPacket = {
 var requestRSSI = function(){
   sp.write(XBeeAPI.buildFrame(RSSIRequestPacket));
   //console.log(XBeeAPI.buildFrame(RSSIRequestPacket));
+  writer.write({start: "START", Beacon:"", data: ""});
 }
 
 sp.on("open", function () {
@@ -97,28 +107,43 @@ sp.on("open", function () {
 });
 
 XBeeAPI.on("frame_object", function(frame) {
+
   if (frame.type == 144){
     console.log("Beacon ID: " + frame.data[1] + ", RSSI: " + (frame.data[0]));
     if(frame.data[1] == 1)
     {
+
       dataset[0][0] = frame.data[0];
       console.log("Beacon 1 : " + dataset[0][0]);
+      writer.write({start: "", Beacon:"1", data: dataset[0][0]});
+      i++;
+
     }
     if(frame.data[1] == 2)
     {
+
       dataset[0][1] = frame.data[0];
       console.log("Beacon 2 : " + dataset[0][1]);
+      writer.write({Beacon:"2", data: dataset[0][1]});
+      j ++;
     }
     if(frame.data[1] == 3)
     {
+
       dataset[0][2] = frame.data[0];
       console.log("Beacon 3 : " + dataset[0][2]);
+      writer.write({Beacon:"3", data: dataset[0][2]});
+      m ++;
     }
     if(frame.data[1] == 4)
     {
+
       dataset[0][3] = frame.data[0];
       console.log("Beacon 4 : " + dataset[0][3]);
+      writer.write({Beacon:"4", data: dataset[0][3]});
+      n ++;
     }
+    //writer.write({finish: "finish"});
 
     var ans = knn.predict(dataset);
     io.emit('location', ans);

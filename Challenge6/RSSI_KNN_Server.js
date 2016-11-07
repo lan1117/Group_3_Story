@@ -202,7 +202,7 @@ XBeeAPI.on("frame_object", function(frame) {
     }
 
     answer = knn.predict(dataset);
-    io.emit('location', ans);
-    console.log("answer: " + ans);
+    io.emit('location', answer);
+    console.log("answer: " + answer);
   }
 });

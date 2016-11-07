@@ -1,0 +1,320 @@
+/*
+  Theme Name: Triangle
+  Theme Uri: http://www.themeum.com
+  Author: Themeum
+  Author Uri: http://www.themeum.com
+  Description: Creative Site Template
+  Version: 1.1
+  */
+
+  @import url(http://fonts.googleapis.com/css?family=Lato:100,300,400,700);
+  @import url(http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700);
+  @import url(http://fonts.googleapis.com/css?family=Noto+Sans:400,700);
+
+  body {
+    background: #fff;
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 22px;
+    color: #000;
+  }
+
+  html {
+    height: 100%;
+  }
+
+
+  a{
+    color:#C03035;
+  }
+
+  a:hover {
+    outline: none;
+    text-decoration:none;
+    color:#4fcccd;
+  }
+
+  a:focus {
+    outline:none;
+    outline-offset: 0;
+  }
+
+  a {
+    -webkit-transition: 300ms;
+    -moz-transition: 300ms;
+    -o-transition: 300ms;
+    transition: 300ms;
+  }
+
+
+  ul {
+    list-style: none;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+  }
+
+  h1{
+    color: #686868;
+  }
+
+  h2{
+    font-size: 24px;
+    color: #686868;
+  }
+
+  h3{
+    font-size: 18px;
+  }
+
+  .overflow{
+    overflow: hidden;
+  }
+
+  .uppercase{
+    text-transform: uppercase;
+  }
+
+  .btn-common {
+    font-size: 14px;
+    color: #0099ae;
+    border: 1px solid #0099ae;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 300;
+    padding: 10px 25px;
+  }
+
+  #action .col-sm-5{
+    position: absolute;
+
+    top: 0;
+    height: 100%;
+    right: 0;
+  }
+
+
+  .btn-common:hover,
+  .btn-common:focus{
+    outline: none;
+    background: none;
+    box-shadow: none;
+    color: #01707f;
+    border-color:#01707f;
+  }
+
+  .align-right{
+    text-align: right;
+  }
+
+  .inline{
+    display: inline-block;
+  }
+
+  .padding{
+    padding: 65px 0;
+  }
+
+  .padding-bottom{
+    padding-bottom: 65px;
+  }
+
+  .padding-top{
+    padding-top: 90px;
+  }
+
+  .padding-right{
+    padding-right: 80px;
+  }
+
+  .padding-left{
+    padding-left: 80px;
+  }
+
+  .margin-bottom{
+    margin-bottom: 35px;
+  }
+
+
+
+/*************************
+*******Header******
+**************************/
+
+
+#header{
+  margin-bottom: 0;
+  padding: 30px 0 60px 0;
+  background: url(../images/footer.png) 0 100% repeat-x;
+}
+
+#header .navbar-inverse .container{
+  position: relative;
+}
+
+
+
+#header .navbar {
+  background: url(../images/footer.png) 0 100% repeat-x;
+  border: 0;
+  margin-bottom: 0;
+}
+
+#header .navbar-toggle{
+  margin-top: 20px;
+}
+
+#header .navbar-brand{
+  padding: 0;
+  margin-left: 0;
+}
+
+#header .navbar-brand h1{
+  padding: 0;
+  margin: 0;
+}
+
+#header .navbar-nav.navbar-right >li:last-child{
+  margin-right: 20px;
+}
+
+#header .navbar-nav.navbar-right >li a {
+  color: #000;
+  font-size: 12px;
+  padding: 20px;
+  text-transform: uppercase;
+  font-weight: 300;
+}
+
+
+#header .navbar-inverse .navbar-nav  li.active > a,
+#header .navbar-inverse .navbar-nav  li.active > a:focus,
+#header .navbar-nav.navbar-right li > a:hover,
+.navbar-inverse .navbar-nav > .open > a {
+  background-color: inherit;
+  border: 0;
+  color: #00aeef;
+}
+
+#header .navbar-inverse .navbar-nav  li a:hover{
+  color: #00aeef;
+}
+
+
+/*  Dropdown menu*/
+
+ul.sub-menu {
+  display: none;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#header .navbar-nav li ul.sub-menu li a{
+  color: #818285;
+  padding: 5px 0;
+  font-size: 13px;
+  display: block;
+  text-transform: capitalize;
+}
+
+#header .navbar-nav li ul.sub-menu li .active{
+  background: #00aeef;
+  color: #fff;
+  position: relative;
+}
+
+#header .navbar-nav li ul.sub-menu li .active i{
+  position: absolute;
+  font-size: 56px;
+  top: -13px;
+  color: #0884d5;
+}
+
+#header .navbar-nav li ul.sub-menu li .active .fa-angle-right{
+  left: -3px;
+}
+
+#header .navbar-nav li ul.sub-menu li .active .fa-angle-left{
+  right: -3px;
+}
+
+#header .navbar-nav li ul.sub-menu li a:hover,
+#header .navbar-nav li ul.sub-menu li a:focus{
+  background: #00aeef;
+  color: #fff;
+}
+
+.fa-angle-down{
+  padding-left: 5px;
+}
+
+.scaleIn {
+  -webkit-animation-name: scaleIn;
+  animation-name: scaleIn;
+}
+
+@-webkit-keyframes scaleIn {
+  0% {
+    opacity: 0;
+    -webkit-transform: scale(0);
+    transform: scale(0);
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: scale(1);
+    transform: scale(1);
+  }
+}
+
+@keyframes scaleIn {
+  0% {
+    opacity: 0;
+    -webkit-transform: scale(0);
+    -ms-transform: scale(0);
+    transform: scale(0);
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: scale(1);
+    -ms-transform: scale(1);
+    transform: scale(1);
+  }
+}
+
+img.point1,point2,point3,point4{
+	position: absolute;
+	top: 190px;
+  }
+
+  .wrapper
+  	{
+  		overflow: hidden;
+  		padding: 0em 0em 3em 0em;
+  		background: #FFF;
+  	}
+
+  	#wrapper1
+  	{
+  		background: #FFF;
+  	}
+
+  	#wrapper2
+  	{
+  		overflow: hidden;
+  		background: #F3F3F3;
+  		padding: 5em 0em;
+  		text-align: center;
+  	}
+    img.displayed{
+
+       display: block;
+       position:relative;
+       margin-left: auto;
+       margin-right: auto
+
+      }

@@ -149,12 +149,12 @@ var RSSIRequestPacket = {
 var requestRSSI = function(){
   sp.write(XBeeAPI.buildFrame(RSSIRequestPacket));
   console.log("**********************************************************");
-  if(answer > 0) {
-      ans = answer;
-  }
-  io.emit('location', ans);
-  console.log("dataset: " + dataset);
-  console.log("answer: " + ans);
+  // if(answer > 0) {
+  //     ans = answer;
+  // }
+  // io.emit('location', ans);
+  // console.log("dataset: " + dataset);
+  // console.log("answer: " + ans);
   writer.write({start: "START", Beacon:"", data: ""});
 }
 
@@ -202,7 +202,7 @@ XBeeAPI.on("frame_object", function(frame) {
     }
 
     answer = knn.predict(dataset);
-    // io.emit('location', ans);
-    // console.log("answer: " + ans);
+    io.emit('location', ans);
+    console.log("answer: " + ans);
   }
 });

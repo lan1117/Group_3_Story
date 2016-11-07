@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Challenge 6</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/font-awesome.min.css" rel="stylesheet">
+    <link href="css/animate.min.css" rel="stylesheet">
+    <link href="css/lightbox.css" rel="stylesheet">
+	<link href="css/main.css" rel="stylesheet">
+	<link href="css/responsive.css" rel="stylesheet">
+
+    <script>
+    var socket = io();
+    var location1 = [0,0];
+    socket.on('location', function(location){
+      if(location < 21){ location1=[parseInt(location) - 1 , 0] ;}
+      else if (location < 27) {
+        locaiton1=[19 ,parseInt(location)-6];
+        else if (location < 46) {
+          location1=[46-parseInt(location), 6];
+          else {
+            location1=[0 , 51-parseInt(location)];
+          }
+        }
+      }
+    });
+  </script>
+  <script>
+     var Red = null;
+     var i=1;
+        function init(){
+  			   Red = document.getElementById('Red');
+           Red.style.position= 'absolute';
+           Red.style.left ="270px";
+  			   Red.style.top="170px";
+
+              }
+  			function moveRight(){
+  				Red.style.left = 270 + Math.round(location1[0] * 33) + 'px';
+  				Red.style.top = 160 + Math.round(location1[1] * 87) + 'px';
+  				//Red.style.left = parseInt(Red.style.left) + 20 + 'px';
+  				//Red.style.top = parseInt(Red.style.top) + 10 + 'px';
+  				//Green.style.left = parseInt(Green.style.left) + 20 + 'px';
+  				//Green.style.top = parseInt(Green.style.top) + 10 + 'px';
+  				//Black.style.left = parseInt(Black.style.left) + 20 + 'px';
+  				//Black.style.top = parseInt(Black.style.top) + 10 + 'px';
+  			}
+
+              window.onload = init;
+  			setInterval(function(){
+  			moveRight();
+  			   }, 1000);
+  </script>
+	    <script src="js/html5shiv.js"></script>
+	    <script src="js/respond.min.js"></script>
+</head><!--/head-->
+
+<body>
+  <header id="header">
+        <div class="navbar navbar-inverse" role="banner">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="index.html">
+                      <h1>Challenge 6</h1>
+                      <h1>Group3---Localization</h1>
+                      <p>Photonics Center 4th floor</p>
+                    </a>
+
+                </div>
+            </div>
+        </div>
+        </header>
+    <!--/#header-->
+    <div class="wrapper">
+  	<img id="room" class="displayed" src="images/0.png" position="relative" width="850" height="640" alt="" /></div>
+  	<div style="margin-left:240px; width:1200px;">
+      <img id="Red" class="point" src="images/Red.png" position="relative" height="30px" width="30px"/>
+  </div>
+
+    <!--/#home-slider-->
+
+
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/lightbox.min.js"></script>
+    <script type="text/javascript" src="js/wow.min.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+</body>
+</html>

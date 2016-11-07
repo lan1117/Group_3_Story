@@ -11,7 +11,6 @@ var i = 1;
 var j = 1;
 var m = 1;
 var n = 1;
-var ans = 1;
 var answer = 1;
 
 var C = xbee_api.constants;
@@ -149,12 +148,11 @@ var RSSIRequestPacket = {
 var requestRSSI = function(){
   sp.write(XBeeAPI.buildFrame(RSSIRequestPacket));
   console.log("**********************************************************");
-  // if(answer > 0) {
-  //     ans = answer;
-  // }
-  // io.emit('location', ans);
-  // console.log("dataset: " + dataset);
-  // console.log("answer: " + ans);
+  if(answer > 0 && answer < 51) {
+    io.emit('location', answer);
+    //console.log("dataset: " + dataset);
+    console.log("answer: " + answer);
+  }
   writer.write({start: "START", Beacon:"", data: ""});
 }
 
@@ -202,7 +200,7 @@ XBeeAPI.on("frame_object", function(frame) {
     }
 
     answer = knn.predict(dataset);
-    io.emit('location', answer);
-    console.log("answer: " + answer);
+    // io.emit('location', answer);
+    // console.log("answer: " + answer);
   }
 });

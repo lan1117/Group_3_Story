@@ -23,3 +23,6 @@ https://developer.apple.com/xcode/
 
 Update(Nov.7):
 Finish basic fuctions.
+
+Update(Nov.10):
+Finish error detection.

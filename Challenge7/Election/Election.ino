@@ -19,8 +19,8 @@ ZBRxResponse rxResponse = ZBRxResponse();
 ZBTxRequest txRequest;
 AtCommandRequest atRequest = AtCommandRequest((uint8_t*)slCommand);
 AtCommandResponse atResponse;
-uint32_t myAddress64, leaderAddress64, remoteAddress64; 
-uint32_t listAddress64[10];
+uint32_t DeviceID, leaderID, newDevice; 
+uint32_t listID[10];
 uint8_t device = 0;
 bool isInfected = false;
 
@@ -30,6 +30,7 @@ uint8_t heartbeatsLost = 0;
 int button_state = LOW, last_button_state = HIGH;
 int debounce_timestamp = 0;
 int debounce_delay = 50;
+int DeviceID=1;
 
 uint32_t immunityTimeout, infectionRebroadcastTimeout;
 
@@ -40,8 +41,7 @@ void setup() {
   delay(2000);
 
   initLedPins();
-  getMyAddress64();
-  leaderAddress64 = myAddress64;
+  leaderID = DeviceID;
   sendCommand(0x0000FFFF, (uint8_t*)&MSG_DISCOVERY, 1);
   leaderHeartbeatTimeout = millis() + 6000;
 }
@@ -53,7 +53,7 @@ void loop() {
     if (reading != button_state) {
       button_state = reading;
       if (button_state == LOW) {
-        if (leaderAddress64 == myAddress64) {
+        if (leaderID == DeviceID) {
           sendCommand(0x0000FFFF, (uint8_t*)&MSG_CLEAR, 1);
           isInfected = false;
         }
@@ -72,12 +72,12 @@ void loop() {
     if (isAcknowledged) beginElection();
     else {
       sendCommand(0x0000FFFF, (uint8_t*)&MSG_VICTORY, 1);
-      leaderAddress64 = myAddress64;
+      leaderID = DeviceID;
     }
   }
   if (!isElecting) {
     if (millis() > leaderHeartbeatTimeout) {
-      if (leaderAddress64 == myAddress64) {
+      if (leaderID == DeviceID) {
         sendCommand(0x0000FFFF, (uint8_t*) &MSG_HEARTBEAT, 1);
         leaderHeartbeatTimeout = millis() + 6000 / 3;
       } else {
@@ -85,7 +85,7 @@ void loop() {
         beginElection();
       }
     }
-    if (leaderAddress64 != myAddress64 && isInfected && millis() > infectionRebroadcastTimeout) {
+    if (leaderID != DeviceID && isInfected && millis() > infectionRebroadcastTimeout) {
       sendCommand(0x0000FFFF, (uint8_t*) &MSG_INFECTION, 1);
       infectionRebroadcastTimeout = millis() + 4000;
     }
@@ -103,7 +103,7 @@ void initLedPins(void) {
 }
 
 void setLedStates(void) {
-  if (myAddress64 == leaderAddress64) {
+  if (DeviceID == leaderID) {
     digitalWrite(PIN_BLUE_LED, HIGH);
     digitalWrite(PIN_GREEN_LED, LOW);
     digitalWrite(PIN_RED_LED, LOW);
@@ -119,20 +119,6 @@ void setLedStates(void) {
   }
 }
 
-void getMyAddress64(void) {
-  do {
-    do    xbee.send(atRequest);
-    while (!xbee.readPacket(5000) || xbee.getResponse().getApiId() != AT_COMMAND_RESPONSE);
-
-    xbee.getResponse().getAtCommandResponse(atResponse);
-  } while (!atResponse.isOk());
-  for (int i = 0; i < 4; i++) {
-    uint32_t tempVal = atResponse.getValue()[i];
-    myAddress64 |= tempVal << 8 * (3 - i);
-  }
-  Serial.print("myAddress64: ");
-  Serial.println(myAddress64, HEX);
-}
 
 void serialLog(bool in, uint32_t address64, uint8_t payload) {
   if (in)  Serial.print("MSG_IN");
@@ -159,7 +145,7 @@ void sendCommand(uint32_t destinationAddress64, uint8_t* payload, uint8_t length
   } else {
     if (destinationAddress64 == 0x0000FFFF) {
       for (int i = 0; i < device; i++) {
-        txRequest = ZBTxRequest(XBeeAddress64(0x0013A200, listAddress64[i]), payload, length);
+        txRequest = ZBTxRequest(XBeeAddress64(0x0013A200, listID[i]), payload, length);
         xbee.send(txRequest);
       }
     } else {
@@ -178,9 +164,9 @@ void beginElection(void) {
   uint8_t countDevices = 0;
   Serial.println("Candidates:");
   for (int i = 0; i < device; i++) {
-    Serial.println(listAddress64[i], HEX);
-    if (listAddress64[i] > myAddress64) {
-      sendCommand(listAddress64[i], (uint8_t*) &MSG_ELECTION, 1);
+    Serial.println(listID[i], HEX);
+    if (listID[i] > DeviceID) {
+      sendCommand(listID[i], (uint8_t*) &MSG_ELECTION, 1);
       countDevices++;
     }
   }
@@ -191,30 +177,30 @@ void beginElection(void) {
 void readAndHandlePackets(void) {
   if (xbee.readPacket(1) && xbee.getResponse().getApiId() == ZB_RX_RESPONSE) {
     xbee.getResponse().getZBRxResponse(rxResponse);
-    remoteAddress64 = rxResponse.getRemoteAddress64().getLsb();
-    //    if (remoteAddress64 > leaderAddress64) beginElection();     // VERIFY WHETHER YOU ACTUALLY NEED THIS
-    serialLog(true, remoteAddress64, rxResponse.getData(0));
+    newDevice = rxResponse.getnewDevice().getLsb();
+    //    if (newDevice > leaderID) beginElection();     // VERIFY WHETHER YOU ACTUALLY NEED THIS
+    serialLog(true, newDevice, rxResponse.getData(0));
 
     bool inList = false;
     for (int i = 0; i < device; i++)
-      if (listAddress64[i] == remoteAddress64)
+      if (listID[i] == newDevice)
         inList = true;
-    if (!inList) listAddress64[device++] = remoteAddress64;
+    if (!inList) listID[device++] = newDevice;
     switch (rxResponse.getData(0)) {
       case MSG_DISCOVERY:
         if (rxResponse.getDataLength() > 1) {
-          memcpy(&leaderAddress64, rxResponse.getData() + 1, sizeof(leaderAddress64));
-          if (leaderAddress64 < myAddress64) beginElection();
+          memcpy(&leaderID, rxResponse.getData() + 1, sizeof(leaderID));
+          if (leaderID < DeviceID) beginElection();
         } else {
           uint8_t msgPayload[5];
           msgPayload[0] = MSG_DISCOVERY;
-          memcpy(msgPayload + 4, &leaderAddress64, sizeof(leaderAddress64));
-          sendCommand(remoteAddress64, msgPayload, 5);
+          memcpy(msgPayload + 4, &leaderID, sizeof(leaderID));
+          sendCommand(newDevice, msgPayload, 5);
         }
         break;
 
       case MSG_ELECTION:
-        sendCommand(remoteAddress64, (uint8_t*)&MSG_ACK, 1);
+        sendCommand(newDevice, (uint8_t*)&MSG_ACK, 1);
         beginElection();
         break;
 
@@ -224,8 +210,8 @@ void readAndHandlePackets(void) {
         break;
 
       case MSG_VICTORY:
-        if (remoteAddress64 > myAddress64) {
-          leaderAddress64 = remoteAddress64;
+        if (newDevice > DeviceID) {
+          leaderID = newDevice;
           isElecting = false;
           leaderHeartbeatTimeout = millis() + 6000;
           betweenElectionTimeout = millis() + 5000;
@@ -234,16 +220,16 @@ void readAndHandlePackets(void) {
         break;
 
       case MSG_HEARTBEAT:
-        if (myAddress64 == leaderAddress64) {
-          if (remoteAddress64 > myAddress64){
-            leaderAddress64 = remoteAddress64;
+        if (DeviceID == leaderID) {
+          if (newDevice > DeviceID){
+            leaderID = newDevice;
             leaderHeartbeatTimeout = millis() + 6000;
           }
         } else leaderHeartbeatTimeout = millis() + 6000;
         break;
 
       case MSG_INFECTION:
-        if (millis() > immunityTimeout && leaderAddress64 != myAddress64)
+        if (millis() > immunityTimeout && leaderID != DeviceID)
           isInfected = true;
         break;
 

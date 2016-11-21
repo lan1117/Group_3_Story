@@ -1,254 +1,248 @@
 #include <XBee.h>
 #include <SoftwareSerial.h>
-#define PIN_BLUE_LED              6    // leader
-#define PIN_RED_LED               4    // infect
-#define PIN_GREEN_LED             5    // clear
-#define PIN_BUTTON                9     // infection toggle
 
-const uint8_t MSG_ELECTION = 0xB0,
-              MSG_ACK = 0xB1,
-              MSG_VICTORY = 0xB2,
-              MSG_INFECTION = 0xB3,
-              MSG_CLEAR = 0xB4,
-              MSG_DISCOVERY = 0xB5,
-              MSG_HEARTBEAT = 0xB6;
-const uint8_t slCommand[] = {'S', 'L'};
+#define LED_BLUE              6    // leader
+#define LED_RED               4    // infect
+#define LED_GREEN             5    // clear
+#define BUTTON                8    // infection/clear toggle
+
 XBee xbee = XBee();
+//Define SoftSerial TX/RX pins
+//pin2 -> TX of xbee-serial device
+//pin3 -> RX of xbee-serial device
 SoftwareSerial xbeeSerial(2, 3);
 ZBRxResponse rxResponse = ZBRxResponse();
 ZBTxRequest txRequest;
 AtCommandRequest atRequest = AtCommandRequest((uint8_t*)slCommand);
 AtCommandResponse atResponse;
-uint32_t myAddress64, leaderAddress64, remoteAddress64; 
-uint32_t listAddress64[10];
+
+const uint8_t ELECTIONMESSAGE = 0xB0, ACKNOWLEDGE = 0xB1, VICTORYMESSAGE = 0xB2, INFECTIONMESSAGE = 0xB3, CLEARMESSAGE = 0xB4, DISCOVERYMESSAGE = 0xB5, LEADERRESPONSE = 0xB6;
+
+//serial low
+const uint8_t slCommand[] = {'S', 'L'};
+const uint8_t add = 0x0000FFFF, addhigh = 0x0013A200;
+uint8_t DeviceID, leaderID, newDevice; 
+uint8_t listID[10];
 uint8_t device = 0;
-bool isInfected = false;
-
-bool isElecting = false, isAcknowledged = false;
-uint32_t electionTimeout, leaderHeartbeatTimeout, betweenElectionTimeout;
-uint8_t heartbeatsLost = 0;
-int button_state = LOW, last_button_state = HIGH;
-int debounce_timestamp = 0;
-int debounce_delay = 50;
-
-uint32_t immunityTimeout, infectionRebroadcastTimeout;
+bool Infected = false;
+bool Electing = false;
+bool Acknowledged = false;
+uint32_t electionTimeout, leaderResponseTimeout, immunityTimeout, infectionRebroadcastTimeout;
+int buttonState, lastButtonState = LOW;
+int lastDebounceTime = 0;
+int debounceDelay = 50;
+int DeviceID=1;
 
 void setup() {
   Serial.begin(9600);
   xbeeSerial.begin(9600);
   xbee.begin(xbeeSerial);
   delay(2000);
-
   initLedPins();
-  getMyAddress64();
-  leaderAddress64 = myAddress64;
-  sendCommand(0x0000FFFF, (uint8_t*)&MSG_DISCOVERY, 1);
-  leaderHeartbeatTimeout = millis() + 6000;
+  leaderID = DeviceID;
+  sendCommand(add, (uint8_t*)&DISCOVERYMESSAGE, 1);
+  //6000: period for hearing leader's response
+  leaderResponseTimeout = millis() + 6000;
 }
 
 void loop() {
-  int reading = digitalRead(PIN_BUTTON);
-  if (reading != last_button_state) debounce_timestamp = millis();
-  if (millis() - debounce_timestamp > debounce_delay) {
-    if (reading != button_state) {
-      button_state = reading;
-      if (button_state == LOW) {
-        if (leaderAddress64 == myAddress64) {
-          sendCommand(0x0000FFFF, (uint8_t*)&MSG_CLEAR, 1);
-          isInfected = false;
+  // read the state of the switch into a local variable
+  int reading = digitalRead(BUTTON);
+
+  // check to see if you just pressed the button
+  // (i.e. the input went from LOW to HIGH),  and you've waited
+  // long enough since the last press to ignore any noise
+
+  // If the switch changed, due to noise or pressing
+  if (reading != lastButtonState) {
+    // reset the debouncing timer
+    lastDebounceTime = millis();
+  }
+  if (millis() - lastDebounceTime > debounceDelay) {
+    // whatever the reading is at, it's been there for longer
+    // than the debounce delay, so take it as the actual current state
+
+    // if the button state has changed
+    if (reading != buttonState) {
+      buttonState = reading;
+      // only toggle the Button operation if the new button state is HIGH
+      if (buttonState == HIGH) {
+        //if I am the leader, send clear msg to non-leaders
+        if (leaderID == DeviceID) {
+          sendCommand(add, (uint8_t*)&CLEARMESSAGE, 1);
+          Infected = false;
         }
-        else isInfected = true;
+        //if I am a non-leader, I got infected
+        else Infected = true;
       }
     }
   }
-  last_button_state = reading;
 
+  // save the reading.  Next time through the loop,
+  // it'll be the lastButtonState
+  lastButtonState = reading;
+
+  //set three LEDs according to flag isInfected
   setLedStates();
-  readAndHandlePackets();
-  if (isElecting && millis() > electionTimeout) {
-    isElecting = false;
-    leaderHeartbeatTimeout = millis() + 6000;
-    betweenElectionTimeout = millis() + 5000;
-    if (isAcknowledged) beginElection();
+  //handle packet msgs
+  PacketsRead();
+
+  //if an election is over
+  if (Electing && millis() > electionTimeout) {
+    Electing = false;
+    //6000: period for hearing leader's response
+    leaderResponseTimeout = millis() + 6000;
+    //5000: period for complete a election
+    electionTimeout = millis() + 5000;
+    if (Acknowledged) beginElection();
     else {
-      sendCommand(0x0000FFFF, (uint8_t*)&MSG_VICTORY, 1);
-      leaderAddress64 = myAddress64;
+      sendCommand(add, (uint8_t*)&VICTORYMESSAGE, 1);
+      leaderID = DeviceID;
     }
   }
-  if (!isElecting) {
-    if (millis() > leaderHeartbeatTimeout) {
-      if (leaderAddress64 == myAddress64) {
-        sendCommand(0x0000FFFF, (uint8_t*) &MSG_HEARTBEAT, 1);
-        leaderHeartbeatTimeout = millis() + 6000 / 3;
+  if (!Electing) {
+    if (millis() > leaderResponseTimeout) {
+      if (leaderID == DeviceID) {
+        sendCommand(add, (uint8_t*) &LEADERRESPONSE, 1);
+        leaderResponseTimeout = millis() + 6000 / 3;
       } else {
-        Serial.println("Leader dead. Relecting");
+        Serial.println("Leader dead.");
         beginElection();
       }
     }
-    if (leaderAddress64 != myAddress64 && isInfected && millis() > infectionRebroadcastTimeout) {
-      sendCommand(0x0000FFFF, (uint8_t*) &MSG_INFECTION, 1);
+    if (leaderID != DeviceID && Infected && millis() > infectionRebroadcastTimeout) {
+      sendCommand(add, (uint8_t*) &INFECTIONMESSAGE, 1);
+      //4000: period for sending infection message to all non-leaders 
       infectionRebroadcastTimeout = millis() + 4000;
     }
   }
 }
 
 void initLedPins(void) {
-  pinMode(PIN_BLUE_LED, OUTPUT);
-  pinMode(PIN_RED_LED, OUTPUT);
-  pinMode(PIN_GREEN_LED, OUTPUT);
-
-  digitalWrite(PIN_BLUE_LED, HIGH);
-  digitalWrite(PIN_RED_LED, LOW);
-  digitalWrite(PIN_GREEN_LED, HIGH);
+  pinMode(LED_BLUE, OUTPUT);
+  pinMode(LED_RED, OUTPUT);
+  pinMode(LED_GREEN, OUTPUT);
+  digitalWrite(LED_BLUE, HIGH);
+  digitalWrite(LED_RED, HIGH);
+  digitalWrite(LED_GREEN, HIGH);
 }
 
 void setLedStates(void) {
-  if (myAddress64 == leaderAddress64) {
-    digitalWrite(PIN_BLUE_LED, HIGH);
-    digitalWrite(PIN_GREEN_LED, LOW);
-    digitalWrite(PIN_RED_LED, LOW);
+  //if I am the leader, just keep blue LED up
+  //if I am the non-leader, check I have to light green or red
+  if (DeviceID == leaderID) {
+    digitalWrite(LED_BLUE, HIGH);
+    digitalWrite(LED_GREEN, LOW);
+    digitalWrite(LED_RED, LOW);
   } else {
-    digitalWrite(PIN_BLUE_LED, LOW);
-    if (isInfected) {
-      digitalWrite(PIN_GREEN_LED, LOW);
-      digitalWrite(PIN_RED_LED, HIGH);
+    digitalWrite(LED_BLUE, LOW);
+    if (Infected) {
+      digitalWrite(LED_GREEN, LOW);
+      digitalWrite(LED_RED, HIGH);
     } else {
-      digitalWrite(PIN_GREEN_LED, HIGH);
-      digitalWrite(PIN_RED_LED, LOW);
+      digitalWrite(LED_GREEN, HIGH);
+      digitalWrite(LED_RED, LOW);
     }
   }
 }
 
-void getMyAddress64(void) {
-  do {
-    do    xbee.send(atRequest);
-    while (!xbee.readPacket(5000) || xbee.getResponse().getApiId() != AT_COMMAND_RESPONSE);
-
-    xbee.getResponse().getAtCommandResponse(atResponse);
-  } while (!atResponse.isOk());
-  for (int i = 0; i < 4; i++) {
-    uint32_t tempVal = atResponse.getValue()[i];
-    myAddress64 |= tempVal << 8 * (3 - i);
-  }
-  Serial.print("myAddress64: ");
-  Serial.println(myAddress64, HEX);
-}
-
-void serialLog(bool in, uint32_t address64, uint8_t payload) {
-  if (in)  Serial.print("MSG_IN");
-  else Serial.print("                                       MSG_OUT");
-  Serial.print(":");
-  Serial.print(address64, HEX);
-  Serial.print(":");
-  switch (payload) {
-    case MSG_ELECTION: Serial.println("ELECTION"); break;
-    case MSG_ACK: Serial.println("ACK"); break;
-    case MSG_VICTORY: Serial.println("VICTORY"); break;
-    case MSG_INFECTION: Serial.println("INFECTION");  break;
-    case MSG_CLEAR: Serial.println("CLEAR");  break;
-    case MSG_DISCOVERY: Serial.println("DISCOVERY"); break;
-    case MSG_HEARTBEAT: Serial.println("HEARTBEAT"); break;
-  }
-}
-
-void sendCommand(uint32_t destinationAddress64, uint8_t* payload, uint8_t length) {
-  serialLog(false, destinationAddress64, payload[0]);
-  if (payload[0] == MSG_DISCOVERY || payload[0] == MSG_VICTORY) {
-    txRequest = ZBTxRequest(XBeeAddress64(0x00000000, 0x0000FFFF), payload, length);
+void sendCommand(uint32_t destinationID, uint8_t* payload, uint8_t length) {
+  if (payload[0] == DISCOVERYMESSAGE || payload[0] == VICTORYMESSAGE) {
+    txRequest = ZBTxRequest(XBeeAddress(0x00000000, add), payload, length);
     xbee.send(txRequest);
   } else {
-    if (destinationAddress64 == 0x0000FFFF) {
+    if (destinationID == add) {
       for (int i = 0; i < device; i++) {
-        txRequest = ZBTxRequest(XBeeAddress64(0x0013A200, listAddress64[i]), payload, length);
+        txRequest = ZBTxRequest(XBeeAddress(addhigh, listID[i]), payload, length);
         xbee.send(txRequest);
       }
     } else {
-      txRequest = ZBTxRequest(XBeeAddress64(0x0013A200, destinationAddress64), payload, length);
+      txRequest = ZBTxRequest(XBeeAddress(addhigh, destinationID), payload, length);
       xbee.send(txRequest);
     }
   }
 }
 
 void beginElection(void) {
-  if (isElecting)  return;
-  if (millis() < betweenElectionTimeout) return;
-  else isElecting = true;
-  Serial.println("Began election");
-  isAcknowledged = false;
+  if (Electing)  return;
+  if (millis() < electionTimeout) return;
+  else Electing = true;
+  Acknowledged = false;
   uint8_t countDevices = 0;
-  Serial.println("Candidates:");
   for (int i = 0; i < device; i++) {
-    Serial.println(listAddress64[i], HEX);
-    if (listAddress64[i] > myAddress64) {
-      sendCommand(listAddress64[i], (uint8_t*) &MSG_ELECTION, 1);
+    if (listID[i] > DeviceID) {
+      sendCommand(listID[i], (uint8_t*) &ELECTIONMESSAGE, 1);
       countDevices++;
     }
   }
+  //1000: period for hearing replys from other devices
   if (countDevices > 0) electionTimeout = millis() + 1000;
   else electionTimeout = millis();
 }
 
-void readAndHandlePackets(void) {
+void PacketsRead(void) {
+  //  get a response && this response is current type
   if (xbee.readPacket(1) && xbee.getResponse().getApiId() == ZB_RX_RESPONSE) {
     xbee.getResponse().getZBRxResponse(rxResponse);
-    remoteAddress64 = rxResponse.getRemoteAddress64().getLsb();
-    //    if (remoteAddress64 > leaderAddress64) beginElection();     // VERIFY WHETHER YOU ACTUALLY NEED THIS
-    serialLog(true, remoteAddress64, rxResponse.getData(0));
-
+    newDevice = rxResponse.getnewDevice().getLsb();
     bool inList = false;
     for (int i = 0; i < device; i++)
-      if (listAddress64[i] == remoteAddress64)
+      if (listID[i] == newDevice)
         inList = true;
-    if (!inList) listAddress64[device++] = remoteAddress64;
+    if (!inList) listID[device++] = newDevice;
+    
     switch (rxResponse.getData(0)) {
-      case MSG_DISCOVERY:
+      case DISCOVERYMESSAGE:
         if (rxResponse.getDataLength() > 1) {
-          memcpy(&leaderAddress64, rxResponse.getData() + 1, sizeof(leaderAddress64));
-          if (leaderAddress64 < myAddress64) beginElection();
+          memcpy(&leaderID, rxResponse.getData() + 1, sizeof(leaderID));
+          if (leaderID < DeviceID) beginElection();
         } else {
           uint8_t msgPayload[5];
-          msgPayload[0] = MSG_DISCOVERY;
-          memcpy(msgPayload + 4, &leaderAddress64, sizeof(leaderAddress64));
-          sendCommand(remoteAddress64, msgPayload, 5);
+          msgPayload[0] = DISCOVERYMESSAGE;
+          memcpy(msgPayload + 4, &leaderID, sizeof(leaderID));
+          sendCommand(newDevice, msgPayload, 5);
         }
         break;
 
-      case MSG_ELECTION:
-        sendCommand(remoteAddress64, (uint8_t*)&MSG_ACK, 1);
+      case ELECTIONMESSAGE:
+        sendCommand(newDevice, (uint8_t*)&ACKNOWLEDGE, 1);
         beginElection();
         break;
 
-      case MSG_ACK:
+      case ACKNOWLEDGE:
+        //3000: period for a victory being elected
         electionTimeout = millis() + 3000 ;
-        isAcknowledged = true;
+        Acknowledged = true;
         break;
 
-      case MSG_VICTORY:
-        if (remoteAddress64 > myAddress64) {
-          leaderAddress64 = remoteAddress64;
-          isElecting = false;
-          leaderHeartbeatTimeout = millis() + 6000;
-          betweenElectionTimeout = millis() + 5000;
+      case VICTORYMESSAGE:
+        if (newDevice > DeviceID) {
+          leaderID = newDevice;
+          Electing = false;
+          leaderResponseTimeout = millis() + 6000;
+          //5000: period for complete a election
+          electionTimeout = millis() + 5000;
         }
         else beginElection();
         break;
 
-      case MSG_HEARTBEAT:
-        if (myAddress64 == leaderAddress64) {
-          if (remoteAddress64 > myAddress64){
-            leaderAddress64 = remoteAddress64;
-            leaderHeartbeatTimeout = millis() + 6000;
+      case LEADERRESPONSE:
+        if (DeviceID == leaderID) {
+          if (newDevice > DeviceID){
+            leaderID = newDevice;
+            leaderResponseTimeout = millis() + 6000;
           }
-        } else leaderHeartbeatTimeout = millis() + 6000;
+        } else leaderResponseTimeout = millis() + 6000;
         break;
 
-      case MSG_INFECTION:
-        if (millis() > immunityTimeout && leaderAddress64 != myAddress64)
-          isInfected = true;
+      case INFECTIONMESSAGE:
+        if (millis() > immunityTimeout && leaderID != DeviceID)
+          Infected = true;
         break;
 
-      case MSG_CLEAR:
-        isInfected = false;
+      case CLEARMESSAGE:
+        Infected = false;
+        //3000: period for a non-leader being infected from normal state
         immunityTimeout = millis() + 3000;
         break;
     }

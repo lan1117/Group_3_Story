@@ -1,4 +1,4 @@
-# EC544 Challenge7 -- Infectious Swarm.
+# EC544 Challenge7 -- Infectious Swarm
 
 In this challenge, we created a swarm with the Arduino-XBee. The swarm can react to an “infection” triggered by a button push.
 

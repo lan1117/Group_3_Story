@@ -61,7 +61,29 @@
 	    <script src="js/html5shiv.js"></script>
 	    <script src="js/respond.min.js"></script>
 </head><!--/head-->
+<style type = "text/css">
+button{
+	font-size: 10px;
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+	width: 40px;
+	hight: 20px;
+}
+img.video{
+	position: absolute;
+	top: 20%;
+	left: 5%;
+	width: 40%;
+	height: 90%;
+}
+img.room{
+	position: absolute;
+	top: 20%;
+	left: 50%;
+	width: 40%;
+	height: 90%;
+}
 
+</style>
 <body>
   <header id="header">
         <div class="navbar navbar-inverse" role="banner">
@@ -79,9 +101,24 @@
         </header>
     <!--/#header-->
     <div class="wrapper">
-  	<img id="room" class="displayed" src="images/0.png" position="relative" width="850" height="640" alt="" /></div>
+    <img id="video" src="http://ec544d.ddns.net:8081/" class="video" top="200px" left="100px" height="650px" width="400px"/>
+  	<img id="room" class="room" src="images/0.png" left="780px" width="400" height="650" alt="" /></div>
   	<div style="margin-left:240px; width:1200px;">
       <img id="Red" class="point" src="images/Red.png" position="relative" height="30px" width="30px"/>
+      <button onClick="forward()" class="myButton" style="position: absolute; top: 136px; left: 230px;">Forward</button>
+	<p><button onClick="right()" class="myButtonPink" style="position: absolute; top: 210px; left: 318px;">Right</button>
+	<button onClick="stop()" class="myButtonRed" style="position: absolute; top: 210px; left: 230px;">Stop</button>
+	<button onClick="left()" class="myButtonBlue" style="position: absolute; top: 210px; left: 147px;">Left</button>
+	</p>
+	<button onClick="back()" class="myButton" style="position: absolute; top: 285px; left: 230px;">Back</button>
+	<div id="welcome" class="container">
+	<div>
+	<label style="margin-left:445px; margin-top:20px;">
+		<input id="checkbox" type="checkbox" onclick onchange="onoff()"/>
+		<span data-on="On" data-off="Off"></span>
+	</label>
+	</div>
+  </div>
   </div>
 
     <!--/#home-slider-->

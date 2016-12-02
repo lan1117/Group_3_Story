@@ -1,5 +1,14 @@
 var SerialPort = require("serialport");
-var app = require('express')();
+
+portConfig = {
+  baudRate: 9600,
+  parser: SerialPort.parsers.readline("\n")
+};
+
+
+var CarStatus = "0";
+
+
 var xbee_api = require('xbee-api');
 
 var csvWriter = require('csv-write-stream');
@@ -18,7 +27,8 @@ var XBeeAPI = new xbee_api.XBeeAPI({
   api_mode: 2
 });
 
-var portName = process.argv[2];
+var portName1 = process.argv[2];//AT
+var portName2 = process.argv[3];//API
 
 var sampleDelay = 2000;
 
@@ -76,7 +86,13 @@ portConfig = {
 
 io.on('connection', function(socket){
   console.log('a user connected');
+  io.emit('updated CarStatus', CarStatus);
   socket.on('disconnect', function(){
+  });
+  socket.on('cStatus', function(msg){
+    CarStatus = msg;
+    sp1.write(msg + "\n");
+    console.log('car status:' + msg);
   });
 });
 
@@ -86,8 +102,10 @@ http.listen(4000, function(){
 });
 
 
-var sp;
-sp = new SerialPort.SerialPort(portName, portConfig);
+var sp1;
+var sp2;
+sp1 = new SerialPort.SerialPort(portName1, portConfig);//AT
+sp2 = new SerialPort.SerialPort(portName2, portConfig);//API
 
 
 //Create a packet to be sent to all other XBEE units on the PAN.
@@ -101,7 +119,7 @@ var RSSIRequestPacket = {
 }
 
 var requestRSSI = function(){
-  sp.write(XBeeAPI.buildFrame(RSSIRequestPacket));
+  sp2.write(XBeeAPI.buildFrame(RSSIRequestPacket));
   console.log("**********************************************************");
   if(answer > 0 && answer < 51) {
     io.emit('location', answer);
@@ -111,8 +129,13 @@ var requestRSSI = function(){
   writer.write({start: "START", Beacon:"", data: ""});
 }
 
-sp.on("open", function () {
+sp1.on("open", function () {
   console.log('open');
+  sp1.on('data', function(receivedStatus){
+    io.emit('upcStatus', receivedStatus);
+    console.log('received:' + receivedStatus);
+    CarStatus = receivedStatus;
+  });
   requestRSSI();
   setInterval(requestRSSI, sampleDelay);
 });

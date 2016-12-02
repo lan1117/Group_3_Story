@@ -1,13 +1,6 @@
 var SerialPort = require("serialport");
 
-portConfig = {
-  baudRate: 9600,
-  parser: SerialPort.parsers.readline("\n")
-};
-
-
 var CarStatus = "0";
-
 
 var xbee_api = require('xbee-api');
 
@@ -26,6 +19,17 @@ var C = xbee_api.constants;
 var XBeeAPI = new xbee_api.XBeeAPI({
   api_mode: 2
 });
+
+portConfigAT = {
+  baudRate: 9600,
+  parser: SerialPort.parsers.readline("\n")
+};
+
+//Note that with the XBeeAPI parser, the serialport's "data" event will not fire when messages are received!
+portConfigAPI = {
+  baudRate: 9600,
+  parser: XBeeAPI.rawParser()
+};
 
 var portName1 = process.argv[2];//AT
 var portName2 = process.argv[3];//API
@@ -78,12 +82,6 @@ knn.k = 3;
 
 var dataset = [[0,0,0,0]];
 
-//Note that with the XBeeAPI parser, the serialport's "data" event will not fire when messages are received!
-portConfig = {
-  baudRate: 9600,
-  parser: XBeeAPI.rawParser()
-};
-
 io.on('connection', function(socket){
   console.log('a user connected');
   io.emit('updated CarStatus', CarStatus);
@@ -101,12 +99,10 @@ http.listen(4000, function(){
   console.log('listening on *:4000');
 });
 
-
 var sp1;
 var sp2;
-sp1 = new SerialPort.SerialPort(portName1, portConfig);//AT
-sp2 = new SerialPort.SerialPort(portName2, portConfig);//API
-
+sp1 = new SerialPort.SerialPort(portName1, portConfigAT);//AT
+sp2 = new SerialPort.SerialPort(portName2, portConfigAPI);//API
 
 //Create a packet to be sent to all other XBEE units on the PAN.
 // The value of 'data' is meaningless, for now.
@@ -125,20 +121,30 @@ var requestRSSI = function(){
     io.emit('location', answer);
     //console.log("dataset: " + dataset);
     console.log("answer: " + answer);
+
+    if(answer == 7 || answer == 9 || answer == 15) {
+      sp1.write("t");
+      console.log("t");
+    }
   }
   writer.write({start: "START", Beacon:"", data: ""});
 }
 
+
 sp1.on("open", function () {
-  console.log('open');
-  sp1.on('data', function(receivedStatus){
-    io.emit('upcStatus', receivedStatus);
-    console.log('received:' + receivedStatus);
-    CarStatus = receivedStatus;
+  console.log('sp2 open');
+  sp2.on("open", function () {
+    console.log('sp1 open');
+    // sp2.on('data', function(receivedStatus){
+    //   io.emit('upcStatus', receivedStatus);
+    //   console.log('received:' + receivedStatus);
+    //   CarStatus = receivedStatus;
+    // });
+    requestRSSI();
+    setInterval(requestRSSI, sampleDelay);
   });
-  requestRSSI();
-  setInterval(requestRSSI, sampleDelay);
 });
+
 
 XBeeAPI.on("frame_object", function(frame) {
   if (frame.type == 144){
@@ -178,7 +184,10 @@ XBeeAPI.on("frame_object", function(frame) {
     }
 
     answer = knn.predict(dataset);
+
     // io.emit('location', answer);
     // console.log("answer: " + answer);
   }
 });
+
+

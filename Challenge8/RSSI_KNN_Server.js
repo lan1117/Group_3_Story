@@ -132,7 +132,7 @@ io.on('connection', function(socket){
     CarStatus = msg;
     sp.write(msg + "\n");
     console.log('car status:' + msg);
-  })
+  });
 });
 
 http.listen(4000, function(){

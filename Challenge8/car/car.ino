@@ -71,7 +71,7 @@ void Poll_Sonic()
   Sonic_L_signed = dist1 * 2.54;
   Sonic_R_signed = dist2 * 2.54;
   Input = Sonic_L_signed - Sonic_R_signed; 
-  PrintSonic();
+ // PrintSonic();
 }
 
 void PrintSonic()
@@ -295,7 +295,7 @@ void Poll_Remote() {
 
 /***************************************ON/OFF Control***************************************/
 void checkMode() {
-  Serial.println("Check Mode.");
+  //Serial.println("Check Mode.");
   char r;
   String data;
   if (XBee.available()) {
@@ -312,7 +312,7 @@ void checkMode() {
     // auto drive command received
     if (data[i] == 'a') {
       Serial.println("Remote AUTO DRIVE received. Calibrating ESC.");
-      Start = 1;
+    //  Start = 1;
       Manual = 0;
     }
     //manual drive command received
@@ -320,68 +320,90 @@ void checkMode() {
       Serial.println();
       Serial.println("Remote MANUAL DRIVE received. Exiting Loop.");
       Serial.println();
-      Start = 0;
+     // Start = 0;
       Manual = 1;
       delay(250);
-      setup();
+    //  setup();
     }
   }
 }
 
 void checkCommand() {
-  Serial.println("Check Command from remote control.");
-  char r;
+  //Serial.println("Check Command from remote control.");
+  char r,r1;
   String data;
   if (XBee.available()) {
-  do {
-    r = XBee.read();
-    data += r;   
-  } 
-  while (r != -1);
-  data = data.substring(0,data.length() - 1);
+  //do {
+    r1 = XBee.read();
+    r= r1;   
+  //} 
+  //while (r != -1);
+ // data = data.substring(0,data.length() - 1);
   }
   
   // Check data for server shutdown signal while awaiting handshake
-  for (int i=0;i<data.length();i++) {
+ // for (int i=0;i<data.length();i++) {
     // FORWARD command received
-    if (data[i] == '1') {
+    if(Manual == 1)
+    {
+       if (r == '1') {
       Serial.println("Remote FORWARD received. Calibrating ESC.");
+     // Start = 1;
+      esc.write(75);
+      wheels.write(90);
+       }
+    // FORWARD command received
+      else if (r == '0') {
+      Serial.println();
+      Serial.println("Remote OFF received. Exiting Loop.");
+      Serial.println();
+    //  Start = 0;
+      wheels.write(90);
+     // delay(250);
+      setup();
+      }
+    else if(r== '2') {
+      Serial.println();
+      Serial.println("Remote LEFT TURN received.");
+      Serial.println();
+     // delay(250);
+      wheels.write(160);
+    }
+    else if(r == '3') {
+      Serial.println();
+      Serial.println("Remote RIGHT TURN received.");
+      Serial.println();
+     // delay(250);
+      wheels.write(20);
+    }
+    else if(r == '4') {
+      Serial.println();
+      Serial.println("Remote BACK received.");
+      Serial.println();
+     // esc.write(105);
+      wheels.write(90);
+    }
+    }
+    else if(Manual == 0)
+    {
+      if (r == '1') {
+      Serial.println("Remote FORWARD auto received. Calibrating ESC.");
       Start = 1;
       esc.write(75);
       wheels.write(90);
     }
     // FORWARD command received
-    else if (data[i] == '0') {
+    else if (r == '0') {
       Serial.println();
-      Serial.println("Remote OFF received. Exiting Loop.");
+      Serial.println("Remote OFF auto received. Exiting Loop.");
       Serial.println();
       Start = 0;
       wheels.write(90);
       delay(250);
       setup();
     }
-    else if(data[i] == '2') {
-      Serial.println();
-      Serial.println("Remote LEFT TURN received.");
-      Serial.println();
-      delay(250);
-      wheels.write(130);
     }
-    else if(data[i] == '3') {
-      Serial.println();
-      Serial.println("Remote RIGHT TURN received.");
-      Serial.println();
-      delay(250);
-      wheels.write(50);
-    }
-    else if(data[i] == '4') {
-      Serial.println();
-      Serial.println("Remote BACK received.");
-      Serial.println();
-      esc.write(105);
-      wheels.write(90);
-    }
-  }
+  //}
 }
 
 void checkOn() {
@@ -428,9 +450,10 @@ void setup() {
   
   // Servo calibration
   esc.write(90); // neutral
+  wheels.write(90);
   Serial.println("Car stops at first");
-  while (Start == 0)
-    checkOn();
+  //while (Start)
+  //  checkOn();
 
   delay(1000);
 
@@ -452,7 +475,7 @@ void setup() {
 
   // Check distances
   Serial.print("Initial Position:   "); 
-  Poll_Sonic();
+  //Poll_Sonic();
   Serial.println("Starting...");
   Serial.println("\n");
   delay(500);
@@ -463,8 +486,11 @@ void loop() {
   checkMode();
  // esc.write(78);
   // Remote
-  if(Manual == 1) { 
-    checkCommand();
+  checkCommand();
+ // Serial.println(Manual);
+  
+  if(Manual == 1) 
+  { 
   }
   else {
   // Stopping

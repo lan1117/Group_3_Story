@@ -71,19 +71,19 @@ void Poll_Sonic()
   Sonic_L_signed = dist1 * 2.54;
   Sonic_R_signed = dist2 * 2.54;
   Input = Sonic_L_signed - Sonic_R_signed; 
- // PrintSonic();
+  PrintSonic();
 }
 
 void PrintSonic()
 {
- /* Serial.print("Left: ");
+  Serial.print("Left: ");
   Serial.print(Sonic_L_signed);
   Serial.print("lidar_dist");
   Serial.print("Right: ");
   Serial.print(Sonic_R_signed);
   Serial.println("lidar_dist");
   Serial.print("Input (L - R): ");
-  Serial.println(Input);*/
+  Serial.println(Input);
 }
 
 /**********************************Lidar Detect Obstacle*********************************/
@@ -123,10 +123,10 @@ void PID_Control() {
   if (!ObjectDetected)
     MoveCar();
   else {
-  //  Serial.println("            OBJECT DETECTED!");
+    Serial.println("            OBJECT DETECTED!");
   //  Serial.println("Back Up!");
     
-    Speed = 110;
+    Speed = 90;
     esc.write(Speed);
     delay(3000);
 
@@ -294,13 +294,14 @@ void Poll_Remote() {
 }
 
 /***************************************ON/OFF Control***************************************/
-void checkMode() {
+/*void checkMode() {
   //Serial.println("Check Mode.");
   char r;
   String data;
   if (XBee.available()) {
   do {
     r = XBee.read();
+    Serial.println(r);
     data += r;   
   } 
   while (r != -1);
@@ -327,7 +328,7 @@ void checkMode() {
     }
   }
 }
-
+*/
 void checkCommand() {
   //Serial.println("Check Command from remote control.");
   char r,r1;
@@ -335,14 +336,31 @@ void checkCommand() {
   if (XBee.available()) {
   //do {
     r1 = XBee.read();
-    r= r1;   
-  //} 
-  //while (r != -1);
+    r= r1;
+   //data += r; 
+   // Serial.println(r); 
+ // } 
+ // while (r != -1);
  // data = data.substring(0,data.length() - 1);
   }
   
   // Check data for server shutdown signal while awaiting handshake
- // for (int i=0;i<data.length();i++) {
+//  for (int i=0;i<data.length();i++) {
+    if (r == 'a') {
+      Serial.println("Remote AUTO DRIVE received. Calibrating ESC.");
+    //  Start = 1;
+      Manual = 0;
+    }
+    //manual drive command received
+    else if (r == 'm') {
+      Serial.println();
+      Serial.println("Remote MANUAL DRIVE received. Exiting Loop.");
+      Serial.println();
+     // Start = 0;
+      Manual = 1;
+      delay(250);
+    //  setup();
+    }
     // FORWARD command received
     if(Manual == 1)
     {
@@ -399,14 +417,22 @@ void checkCommand() {
       Serial.println();
       Start = 0;
       wheels.write(90);
-      delay(250);
+      //delay(250);
       setup();
+    }
+    else if (r == 't') {
+      Serial.println();
+      Serial.println("Turn");
+      Serial.println();
+      esc.write(80);
+      wheels.write(40);
+     // delay(250);
     }
     }
   //}
 }
 
-void checkOn() {
+/*void checkOn() {
   char r;
   String data;
   if (XBee.available()) {
@@ -427,7 +453,7 @@ void checkOn() {
       wheels.write(90);
     }
   }
-}
+}*/
 
   
 /***************************************Set Up********************************************/
@@ -483,7 +509,7 @@ void setup() {
 
 /*****************************************Loop**********************************************/
 void loop() {
-  checkMode();
+  //checkMode();
  // esc.write(78);
   // Remote
   checkCommand();

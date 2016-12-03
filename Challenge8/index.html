@@ -71,29 +71,29 @@ function back(num){
 }
 
 function on(num){
-  cStatus[num - 1] = "m";
+  cStatus[num - 1] = "a";
   socket.emit('cStatus', cStatus.toString().replace(/,/g,''));
 };
 
 function off(num){
-  cStatus[num - 1] = "a";
+  cStatus[num - 1] = "m";
   socket.emit('cStatus', cStatus.toString().replace(/,/g,''));
 }
 
   socket.on('location', function(location){
     location3 = location2;
     location2 = location1;
-    if (parseInt(location) >= 1 && parseInt(location) <=20){
-      location1 = [10 - parseInt(location), -3]
+    if (parseInt(location) >= 1 && parseInt(location) <=7){
+      location1 = [1 - parseInt(location), 0]
     }
-    else if(parseInt(location) >20 && parseInt(location) <=26){
-      location1 = [-10, parseInt(location) - 23]
+    else if(parseInt(location) >7 && parseInt(location) <=9){
+      location1 = [-6, parseInt(location) － 7 ]
     }
-    else if(parseInt(location) >26 && parseInt(location) <=45){
-      location1 = [parseInt(location) - 36, 3]
+    else if(parseInt(location) >9 && parseInt(location) <=15){
+      location1 = [parseInt(location) - 15, 2]
     }
-    else if(parseInt(location) >45 ){
-      location1 = [10, 48 - parseInt(location)]
+    else if(parseInt(location) >15 ){
+      location1 = [0, 17 － parseInt(location)]
     }
     console.log("location1:" + location1);
     //location1 = [parseInt(location) / 6 * 25, ((parseInt(location) % 6) - 1) * 28];
@@ -114,8 +114,8 @@ function off(num){
 			   xbeeb = document.getElementById('bottom');
 			   xbeeb2 = document.getElementById('bottom2');
                Red.style.position= 'absolute';
-               Red.style.left ="210px";
-			   Red.style.top="250px";
+               Red.style.left ="935px"; 
+			   Red.style.top="120px";
 			   xbeer.style.position='absolute';
 			   xbeer.style.left="880px";
 			   xbeer.style.top="800px";
@@ -130,8 +130,8 @@ function off(num){
 			   xbeeb2.style.top="250px";
             }
 			function moveRight(){
-				Red.style.left = 548.4 + Math.round(location1[0] * 36.84) + 'px';
-				Red.style.top = 525 - Math.round(location1[1] * 91.67) + 'px';
+				Red.style.left = 935 - Math.round(location1[1] * 172.5) + 'px';
+				Red.style.top = 120 - Math.round(location1[0] * 68.572857) + 'px';
 			}
             window.onload = init;
 			setInterval(function(){
@@ -148,28 +148,33 @@ function off(num){
 	</div>
 </div>
 <div class="wrapper">
-	<img id="room" class="displayed" src="images/0.png"  style="position: absolute; top: 15%; left: 50%; width: 400px; height: 600px;" /></div>
+	<img id="room" class="displayed" src="images/0.png"  style="position: absolute; top: 15%; left: 50%; width: 420px; height: 600px;" /></div>
   <div style="margin:0 auto; width:1000px;"><img id="Red" class="point" src="images/Red.png" alt="CAR" position="absolute" height="30px" width="30px"/>
     <h4>AUTO MODE:</h4>
     <button onclick = "on(1)"> On </button>
     <button onclick = "off(1)" > Off </button>
-    <br><br><br><br>
+    <br><br>
 	<div id="welcome" class="container">
-    <div class = "carstatus">
+    <div class = "carstatus" style="float: left; width: 50%;">
       <h4> CAR CONTROL</h4>
-    <button onclick = "start(1)" style = "position: absolution; top: 50%; left: 20%">Start</button>
-      <p><button onclick = "stop(1)" style = "position: absolution; top: 210px; left: 230px;"> Stop</button>
-      <button onclick = "left(1)"style = "position: absolution; top: 210px; left: 147px;"> Left </button>
-      <button onclick = "right(1)" style = "position: absolution; top: 210px; left: 318px;">Right</button>
-      </p>
-      <button onclick = "back(1)" style = "position: absolution; top: 285px; left: 230px;"> Back </button>
+    <button onclick = "start(1)" class = "myButton" style = "position: absolute; top: 40%; left: 10%; height: 30px; width: 60px;">Start</button>
+    <button onclick = "stop(1)" class="myButtonPink"style = "position: absolute; top: 50%; left: 10%; height: 30px; width: 60px;"> Stop</button>
+      <button onclick = "left(1)"style = "position: absolute; top: 50%; left: 2%; height: 30px; width: 60px;"> Left </button>
+      <button onclick = "right(1)" style = "position: absolute; top: 50%; left: 18%; height: 30px; width: 60px;">Right</button>
+      <button onclick = "back(1)" style = "position: absolute; top: 60%; left: 10%; height: 30px; width: 60px;"> Back </button>
     </div>
-    <div style="float: right; width: 50%;">
-      <img id="video" src = "" class = "video" position = "relative" height = "160px" width="240px"
-<div class="title">
-	  <h4></h4>
+    <br><br>
+
+<div class="video">
+
+    <img id="video" src = "" class = "video" position = "relative" height = "160px" width="240px"/>
 		</div>
 	</div>
+  <div class = "video" style="float: left; width: 50%;">
+  <br><br><h4> VIDEO </h4>
+  <img id="video" src = "" class = "video" position = "relative" height = "250px" width="350px"/>
+
+  </div>
 
 </div>
 

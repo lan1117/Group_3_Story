@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+Design by TEMPLATED
+http://templated.co
+Released for free under the Creative Commons Attribution License
+
+Name       : Undeviating
+Description: A two-column, fixed-width design with dark color scheme.
+Version    : 1.0
+Released   : 20140322
+
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<style type = "text/css">
+button{
+  font-size: 10px;
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+	width: 40px;
+	height: 20px;
+}
+</style>
+<body onLoad = "getStat()">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900|Quicksand:400,700|Questrial" rel="stylesheet" />
+<link href="default.css" rel="stylesheet" type="text/css" media="all" />
+<link href="fonts.css" rel="stylesheet" type="text/css" media="all" />
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+
+<!--[if IE 6]><link href="default_ie6.css" rel="stylesheet" type="text/css" /><![endif]-->
+  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+
+
+ <script>
+  var socket = io();
+  var location1 = [0,0];
+  var location2 = [0,0];
+  var location3 = [0,0];
+
+  var cStatus = [0];
+  var sendStatus = [0];
+  socket.on('updated CarStatus', function(msg){
+    cStatus[0] = parseInt(msg.charAt(0));
+  });
+
+function start(num){
+  cStatus[num - 1] = 1;
+  socket.emit('cStatus', cStatus.toString().replace(/,/g,''));
+}
+function stop(num){
+  cStatus[num - 1] = 0;
+  socket.emit('cStatus', cStatus.toString().replace(/,/g,''));
+}
+function right(num){
+  cStatus[num - 1] = 3;
+  socket.emit('cStatus', cStatus.toString().replace(/,/g,''));
+}
+
+function left(num){
+  cStatus[num - 1] = 2;
+  socket.emit('cStatus', cStatus.toString().replace(/,/g,''));
+}
+function back(num){
+  cStatus[num - 1] = 4;
+  socket.emit('cStatus', cStatus.toString().replace(/,/g,''));
+}
+
+function on(num){
+  cStatus[num - 1] = "a";
+  socket.emit('cStatus', cStatus.toString().replace(/,/g,''));
+};
+
+function off(num){
+  cStatus[num - 1] = "m";
+  socket.emit('cStatus', cStatus.toString().replace(/,/g,''));
+}
+
+  socket.on('location', function(location){
+    location3 = location2;
+    location2 = location1;
+    if (parseInt(location) >= 1 && parseInt(location) <=7){
+      location1 = [1 - parseInt(location), 0]
+    }
+    else if(parseInt(location) >7 && parseInt(location) <=9){
+      location1 = [-6, parseInt(location) － 7 ]
+    }
+    else if(parseInt(location) >9 && parseInt(location) <=15){
+      location1 = [parseInt(location) - 15, 2]
+    }
+    else if(parseInt(location) >15 ){
+      location1 = [0, 17 － parseInt(location)]
+    }
+    console.log("location1:" + location1);
+    //location1 = [parseInt(location) / 6 * 25, ((parseInt(location) % 6) - 1) * 28];
+  })
+</script>
+
+<script>
+   var Red = null;
+   var xbeer = null;
+   var xbeel = null;
+   var xbeeb = null;
+
+  var i=1;
+            function init(){
+			   Red = document.getElementById('Red');
+			   xbeer = document.getElementById('right');
+			   xbeel = document.getElementById('left');
+			   xbeeb = document.getElementById('bottom');
+			   xbeeb2 = document.getElementById('bottom2');
+               Red.style.position= 'absolute';
+               Red.style.left ="935px"; 
+			   Red.style.top="120px";
+			   xbeer.style.position='absolute';
+			   xbeer.style.left="880px";
+			   xbeer.style.top="800px";
+			   xbeel.style.position='absolute';
+			   xbeel.style.left="180px";
+			   xbeel.style.top="250px";
+			   xbeeb.style.position='absolute';
+			   xbeeb.style.left="180px";
+			   xbeeb.style.top="800px";
+			   xbeeb2.style.position='absolute';
+			   xbeeb2.style.left="880px";
+			   xbeeb2.style.top="250px";
+            }
+			function moveRight(){
+				Red.style.left = 935 - Math.round(location1[1] * 172.5) + 'px';
+				Red.style.top = 120 - Math.round(location1[0] * 68.572857) + 'px';
+			}
+            window.onload = init;
+			setInterval(function(){
+			moveRight();
+			   }, 1000);
+</script>
+</head>
+<body>
+<div id="header-wrapper">
+	<div id="header" class="container">
+		<div id="logo">
+			<h1>Group 3</a><span style="font-size:0.6em;">--challenge 6 </span></h1>
+		</div>
+	</div>
+</div>
+<div class="wrapper">
+	<img id="room" class="displayed" src="images/0.png"  style="position: absolute; top: 15%; left: 50%; width: 420px; height: 600px;" /></div>
+  <div style="margin:0 auto; width:1000px;"><img id="Red" class="point" src="images/Red.png" alt="CAR" position="absolute" height="30px" width="30px"/>
+    <h4>AUTO MODE:</h4>
+    <button onclick = "on(1)"> On </button>
+    <button onclick = "off(1)" > Off </button>
+    <br><br>
+	<div id="welcome" class="container">
+    <div class = "carstatus" style="float: left; width: 50%;">
+      <h4> CAR CONTROL</h4>
+    <button onclick = "start(1)" class = "myButton" style = "position: absolute; top: 40%; left: 10%; height: 30px; width: 60px;">Start</button>
+    <button onclick = "stop(1)" class="myButtonPink"style = "position: absolute; top: 50%; left: 10%; height: 30px; width: 60px;"> Stop</button>
+      <button onclick = "left(1)"style = "position: absolute; top: 50%; left: 2%; height: 30px; width: 60px;"> Left </button>
+      <button onclick = "right(1)" style = "position: absolute; top: 50%; left: 18%; height: 30px; width: 60px;">Right</button>
+      <button onclick = "back(1)" style = "position: absolute; top: 60%; left: 10%; height: 30px; width: 60px;"> Back </button>
+    </div>
+    <br><br>
+
+<div class="video">
+
+    <img id="video" src = "" class = "video" position = "relative" height = "160px" width="240px"/>
+		</div>
+	</div>
+  <div class = "video" style="float: left; width: 50%;">
+  <br><br><h4> VIDEO </h4>
+  <img id="video" src = "" class = "video" position = "relative" height = "250px" width="350px"/>
+
+  </div>
+
+</div>
+
+</body>
+</html>

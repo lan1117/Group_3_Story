@@ -26,6 +26,11 @@ button{
 
 <meta name="keywords" content="" />
 <meta name="description" content="" />
+<link href="css/font-awesome.min.css" rel="stylesheet">
+<link href="css/animate.min.css" rel="stylesheet">
+<link href="css/lightbox.css" rel="stylesheet">
+<link href="css/main.css" rel="stylesheet">
+<link href="css/responsive.css" rel="stylesheet">
 <link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900|Quicksand:400,700|Questrial" rel="stylesheet" />
 <link href="default.css" rel="stylesheet" type="text/css" media="all" />
 <link href="fonts.css" rel="stylesheet" type="text/css" media="all" />
@@ -83,17 +88,17 @@ function off(num){
   socket.on('location', function(location){
     location3 = location2;
     location2 = location1;
-    if (parseInt(location) >= 1 && parseInt(location) <=20){
-      location1 = [10 - parseInt(location), -3]
+    if (parseInt(location) >= 1 && parseInt(location) <=7){
+      location1 = [ 0 , parseInt(location)]
     }
-    else if(parseInt(location) >20 && parseInt(location) <=26){
-      location1 = [-10, parseInt(location) - 23]
+    else if(parseInt(location) >7 && parseInt(location) <=9){
+      location1 = [ parseInt(location)-7 , 7 ]
     }
-    else if(parseInt(location) >26 && parseInt(location) <=45){
-      location1 = [parseInt(location) - 36, 3]
+    else if(parseInt(location) > 9 && parseInt(location) <=15){
+      location1 = [ 2, 8 - parseInt(location)]
     }
     else if(parseInt(location) >45 ){
-      location1 = [10, 48 - parseInt(location)]
+      location1 = [parseInt(location)-1, 0 ]
     }
     console.log("location1:" + location1);
     //location1 = [parseInt(location) / 6 * 25, ((parseInt(location) % 6) - 1) * 28];
@@ -102,9 +107,6 @@ function off(num){
 
 <script>
    var Red = null;
-   var xbeer = null;
-   var xbeel = null;
-   var xbeeb = null;
 
   var i=1;
             function init(){
@@ -114,24 +116,12 @@ function off(num){
 			   xbeeb = document.getElementById('bottom');
 			   xbeeb2 = document.getElementById('bottom2');
                Red.style.position= 'absolute';
-               Red.style.left ="210px";
-			   Red.style.top="250px";
-			   xbeer.style.position='absolute';
-			   xbeer.style.left="880px";
-			   xbeer.style.top="800px";
-			   xbeel.style.position='absolute';
-			   xbeel.style.left="180px";
-			   xbeel.style.top="250px";
-			   xbeeb.style.position='absolute';
-			   xbeeb.style.left="180px";
-			   xbeeb.style.top="800px";
-			   xbeeb2.style.position='absolute';
-			   xbeeb2.style.left="880px";
-			   xbeeb2.style.top="250px";
+               Red.style.left ="1000px";
+			   Red.style.top="100px";
             }
 			function moveRight(){
-				Red.style.left = 548.4 + Math.round(location1[0] * 36.84) + 'px';
-				Red.style.top = 525 - Math.round(location1[1] * 91.67) + 'px';
+				Red.style.left = 830 - Math.round(location1[0] * 170) + 'px';
+				Red.style.top = 220 + Math.round(location1[1] * 66) + 'px';
 			}
             window.onload = init;
 			setInterval(function(){
@@ -140,37 +130,45 @@ function off(num){
 </script>
 </head>
 <body>
-<div id="header-wrapper">
-	<div id="header" class="container">
-		<div id="logo">
-			<h1>Group 3</a><span style="font-size:0.6em;">--challenge 6 </span></h1>
-		</div>
-	</div>
-</div>
+  <header id="header">
+        <div class="navbar navbar-inverse" role="banner">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="index.html">
+                      <h1>Challenge 6</h1><br>
+                      <h1>Group3---Localization</h1>
+                      <p>Photonics Center 4th floor</p>
+                    </a>
+
+                </div>
+            </div>
+        </div>
+        </header>
 <div class="wrapper">
-	<img id="room" class="displayed" src="images/0.png"  style="position: absolute; top: 15%; left: 50%; width: 400px; height: 600px;" /></div>
-  <div style="margin:0 auto; width:1000px;"><img id="Red" class="point" src="images/Red.png" alt="CAR" position="absolute" height="30px" width="30px"/>
+	<img id="room" class="displayed" src="images/0.png"  style="position: absolute; left: 50%; width: 420px; height: 600px;" /></div>
+  <div style="margin:0 auto;  width:1000px;"><img id="Red" class="point" src="images/4.png" alt="CAR" position="absolute" height="25px" width="25px"/>
     <h4>AUTO MODE:</h4>
     <button onclick = "on(1)"> On </button>
     <button onclick = "off(1)" > Off </button>
-    <br><br><br><br>
+    <br><br>
 	<div id="welcome" class="container">
     <div class = "carstatus">
       <h4> CAR CONTROL</h4>
-    <button onclick = "start(1)" style = "position: absolution; top: 50%; left: 20%">Start</button>
-      <p><button onclick = "stop(1)" style = "position: absolution; top: 210px; left: 230px;"> Stop</button>
-      <button onclick = "left(1)"style = "position: absolution; top: 210px; left: 147px;"> Left </button>
-      <button onclick = "right(1)" style = "position: absolution; top: 210px; left: 318px;">Right</button>
+    <button onclick = "start(1)" style = "position: absolute; top: 60%; left: 15%; ">Start</button>
+      <p><button onclick = "stop(1)" style = "position: absolute; top: 65%; left: 15%;"> Stop</button>
+      <button onclick = "left(1)"style = "position: absolute; top: 65%; left: 10%;"> Left </button>
+      <button onclick = "right(1)" style = "position: absolute; top: 65%; left: 20%;">Right</button>
       </p>
-      <button onclick = "back(1)" style = "position: absolution; top: 285px; left: 230px;"> Back </button>
+      <button onclick = "back(1)" style = "position: absolute; top: 70%; left: 15%;"> Back </button>
     </div>
-    <div style="float: right; width: 50%;">
-      <img id="video" src = "" class = "video" position = "relative" height = "160px" width="240px"
-<div class="title">
-	  <h4></h4>
-		</div>
-	</div>
-
+    <div style = "position: absolute; top: 70%; left: 10%;">
+      <h4>VIDEO</h4>
+      <img id="video" src = "" class = "video" position = "relative" height = "250px" width="350px"
+    <div class="title">
+    <h4></h4>
+    </div>
+  </div>
+</div>
 </div>
 
 </body>

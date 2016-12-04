@@ -126,9 +126,9 @@ var requestRSSI = function(){
     //console.log("dataset: " + dataset);
     console.log("answer: " + answer);
 
-    if(answer == 7 || answer == 9 || answer == 15) {
-      sp1.write("t");
-      console.log("t");
+    if(answer == 8) {
+      sp1.write("n");
+      console.log("n");
     }
   }
   writer.write({start: "START", Beacon:"", data: ""});

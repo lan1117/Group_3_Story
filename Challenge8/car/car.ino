@@ -23,6 +23,7 @@
 SoftwareSerial XBee(2,3); // RX, TX
 int Start = 0;
 int Manual = 1;
+int Turn = 1;
 
 // Servo global variables
 Servo wheels;
@@ -71,19 +72,19 @@ void Poll_Sonic()
   Sonic_L_signed = dist1 * 2.54;
   Sonic_R_signed = dist2 * 2.54;
   Input = Sonic_L_signed - Sonic_R_signed; 
- // PrintSonic();
+  PrintSonic();
 }
 
 void PrintSonic()
 {
- /* Serial.print("Left: ");
+  Serial.print("Left: ");
   Serial.print(Sonic_L_signed);
   Serial.print("lidar_dist");
   Serial.print("Right: ");
   Serial.print(Sonic_R_signed);
   Serial.println("lidar_dist");
   Serial.print("Input (L - R): ");
-  Serial.println(Input);*/
+  Serial.println(Input);
 }
 
 /**********************************Lidar Detect Obstacle*********************************/
@@ -123,10 +124,10 @@ void PID_Control() {
   if (!ObjectDetected)
     MoveCar();
   else {
-  //  Serial.println("            OBJECT DETECTED!");
+    Serial.println("            OBJECT DETECTED!");
   //  Serial.println("Back Up!");
     
-    Speed = 110;
+    Speed = 90;
     esc.write(Speed);
     delay(3000);
 
@@ -241,12 +242,13 @@ void MoveCar() {
       esc.write(Speed); // go slow when no walls on either side (for now at least)  
       // no walls
       if ((Sonic_L_signed > 155) && (Sonic_R_signed > 155)) {
-          if (Input == 0) // straight
-            Offset = 0;
-          else if (Input < 0) // closer to left, drift right slightly
-            Offset = -5;
-          else if (Input > 0) // closer to right, drift left slightly
-            Offset = 5;
+//          if (Input == 0) // straight
+//            Offset = 0;
+//          else if (Input < 0) // closer to left, drift right slightly
+//            Offset = -5;
+//          else if (Input > 0) // closer to right, drift left slightly
+//            Offset = 5;
+          Offset = 60;
           Angle = 90 + Offset;
           wheels.write(Angle);
     /*      Serial.println("NO WALLS! Slowing down.");
@@ -267,40 +269,36 @@ void MoveCar() {
         Serial.println(Speed);*/
       }
       // no right wall
-      else if (Sonic_R_signed > Sonic_L_signed) {
+      else if (Sonic_R_signed > Sonic_L_signed && Sonic_R_signed >150 && Turn == 1) {
         // try to stay ~2ft from only (left) wall
-        if (Sonic_L_signed > 95) // move closer to only (left) wall
-          wheels.write(100);
-        else if (Sonic_L_signed < 70) // move further from only (left) wall
-          wheels.write(40);
-        else 
-          wheels.write(90);
+//        if (Sonic_L_signed > 95) // move closer to only (left) wall
+//          wheels.write(100);
+//        else if (Sonic_L_signed < 70) // move further from only (left) wall
+//          wheels.write(40);
+//        else 
+//          wheels.write(90);
    /*     Serial.println("No RIGHT wall! slowing down.");     
         Serial.print("Speed: ");
         Serial.println(Speed);*/
-    } 
-  }
+       esc.write(80);
+       wheels.write(50);
+       delay(3000);
+       Turn = 1;
+      } 
+    }
  
  // Serial.println();
 }
 
-
-
-
-/*************************************Remote Control*************************************/
-
-void Poll_Remote() {
-
-}
-
 /***************************************ON/OFF Control***************************************/
-void checkMode() {
+/*void checkMode() {
   //Serial.println("Check Mode.");
   char r;
   String data;
   if (XBee.available()) {
   do {
     r = XBee.read();
+    Serial.println(r);
     data += r;   
   } 
   while (r != -1);
@@ -327,7 +325,7 @@ void checkMode() {
     }
   }
 }
-
+*/
 void checkCommand() {
   //Serial.println("Check Command from remote control.");
   char r,r1;
@@ -335,21 +333,38 @@ void checkCommand() {
   if (XBee.available()) {
   //do {
     r1 = XBee.read();
-    r= r1;   
-  //} 
-  //while (r != -1);
+    r= r1;
+   //data += r; 
+   // Serial.println(r); 
+ // } 
+ // while (r != -1);
  // data = data.substring(0,data.length() - 1);
   }
   
   // Check data for server shutdown signal while awaiting handshake
- // for (int i=0;i<data.length();i++) {
+//  for (int i=0;i<data.length();i++) {
+    if (r == 'a') {
+      Serial.println("Remote AUTO DRIVE received. Calibrating ESC.");
+    //  Start = 1;
+      Manual = 0;
+    }
+    //manual drive command received
+    else if (r == 'm') {
+      Serial.println();
+      Serial.println("Remote MANUAL DRIVE received. Exiting Loop.");
+      Serial.println();
+     // Start = 0;
+      Manual = 1;
+      delay(250);
+    //  setup();
+    }
     // FORWARD command received
     if(Manual == 1)
     {
        if (r == '1') {
       Serial.println("Remote FORWARD received. Calibrating ESC.");
      // Start = 1;
-      esc.write(75);
+      esc.write(60);
       wheels.write(90);
        }
     // FORWARD command received
@@ -367,20 +382,20 @@ void checkCommand() {
       Serial.println("Remote LEFT TURN received.");
       Serial.println();
      // delay(250);
-      wheels.write(160);
+      wheels.write(130);
     }
     else if(r == '3') {
       Serial.println();
       Serial.println("Remote RIGHT TURN received.");
       Serial.println();
      // delay(250);
-      wheels.write(20);
+      wheels.write(50);
     }
     else if(r == '4') {
       Serial.println();
       Serial.println("Remote BACK received.");
       Serial.println();
-     // esc.write(105);
+      esc.write(130);
       wheels.write(90);
     }
     }
@@ -399,14 +414,23 @@ void checkCommand() {
       Serial.println();
       Start = 0;
       wheels.write(90);
-      delay(250);
+      //delay(250);
       setup();
+    }
+    else if (r == 'n') {
+      Serial.println();
+      Turn = 0;
+      Serial.println("Not Turn");
+      Serial.println();
+//      esc.write(80);
+//      wheels.write(40);
+     // delay(250);
     }
     }
   //}
 }
 
-void checkOn() {
+/*void checkOn() {
   char r;
   String data;
   if (XBee.available()) {
@@ -427,7 +451,7 @@ void checkOn() {
       wheels.write(90);
     }
   }
-}
+}*/
 
   
 /***************************************Set Up********************************************/
@@ -483,7 +507,7 @@ void setup() {
 
 /*****************************************Loop**********************************************/
 void loop() {
-  checkMode();
+  //checkMode();
  // esc.write(78);
   // Remote
   checkCommand();
@@ -495,7 +519,7 @@ void loop() {
   else {
   // Stopping
     Poll_Lidar();
-    Poll_Remote();
+    //Poll_Remote();
   
     // Steering
     Poll_Sonic();

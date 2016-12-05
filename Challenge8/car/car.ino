@@ -1,10 +1,11 @@
 // Libraries
 #include <SoftwareSerial.h>
 #include <Servo.h>
+#include <PID_v1.h>
 
 
 // Servo pins
-#define ESC_PIN 8
+#define ESC_PIN 13
 #define WHEEL_PIN 9
 
 // Sonic pins
@@ -22,7 +23,7 @@
 // Remote
 SoftwareSerial XBee(2,3); // RX, TX
 int Start = 0;
-int Manual = 1;
+int Manual = 0;
 int Turn = 1;
 
 // Servo global variables
@@ -30,12 +31,17 @@ Servo wheels;
 Servo esc;
 
 // PID Setpoint (difference in distance between walls)
-const int Setpoint = 0;   // maybe make this an int
-
+//const double Setpoint = 0;   // maybe make this an int
+double Setpoint=0, Input, Output;
 // PID constants
-const double Kp = 1;
-const double Ki = 0;
-const double Kd = 0;
+//const double Kp = 1;
+//const double Ki = 0;
+//const double Kd = 0;
+
+double aggKp=4, aggKi=0.2, aggKd=0.1;
+double consKp=1, consKi=0, consKd=0.25;
+
+PID myPID(&Input, &Output, &Setpoint, consKp, consKi, consKd, DIRECT);
 
 // Sonic readings
 unsigned long Sonic_L, Sonic_R;
@@ -49,8 +55,8 @@ int ObjectDetected = 0;
 
 // PID global variables
 const double dt = 10; // poll interval in ms
-int Input;   // Positive means closer to right (so move left)
-int Output; 
+//int Input;   // Positive means closer to right (so move left)
+//int Output; 
 int Error;
 int PreviousErr;
 double Integral;
@@ -96,7 +102,7 @@ void Poll_Lidar() {
   Serial.print(lidar_dist);
   Serial.println("lidar_dist");*/
   
-  if (lidar_dist < 44)               // CHANGE THIS BACK AFTER TESTING
+  if (lidar_dist < 50)               // CHANGE THIS BACK AFTER TESTING
     ObjectDetected = 1;
   else
     ObjectDetected = 0;
@@ -105,7 +111,7 @@ void Poll_Lidar() {
 /***********************************PID Control***************************************/
 
 void PID_Control() {
-  delay(dt);
+  /*delay(dt);
 
   Error = Setpoint - Input;
 
@@ -114,7 +120,7 @@ void PID_Control() {
   
   Output = (Kp * Error) + (Ki * Integral) + (Kd * Derivative);
 
-  PreviousErr = Error;
+  PreviousErr = Error;*/
 
  /* Serial.print("Error: ");
   Serial.println(Error);
@@ -127,9 +133,10 @@ void PID_Control() {
     Serial.println("            OBJECT DETECTED!");
   //  Serial.println("Back Up!");
     
-    Speed = 90;
+    Speed = 110;
     esc.write(Speed);
-    delay(3000);
+    wheels.write(90);
+    delay(1000);
 
   //  Serial.print("Speed: ");
   //  Serial.println(Speed);
@@ -146,13 +153,30 @@ void MoveCar() {
   int Speed;
   int Offset;
   int turnMultiplier = 7;
+  double gap = abs(Setpoint-Input);
+
+ //  if(gap<2)
+  {  //we're close to setpoint, use conservative tuning parameters
+//    myPID.SetTunings(consKp, consKi, consKd);
+  }
+//  else
+ // {
+     //we're far from setpoint, use aggressive tuning parameters
+     myPID.SetTunings(aggKp, aggKi, aggKd);
+ // }
+
+  myPID.Compute();
+  Serial.println("output");
+    Serial.println(Output);
+  wheels.write(90-Output);
 
   // Bad Lidar reading (really when == 0)
-  if ((Sonic_L_signed < 15) || (Sonic_R_signed < 15)) {
+  /*if ((Sonic_L_signed < 15) || (Sonic_R_signed < 15)) {
    // Serial.println("   CASE 1");
     // slow down while lidar reading bad value
     Speed = 78;
     esc.write(Speed); // go slow when no walls on either side (for now at least) 
+
     
     // bad left reading
     if (Sonic_L_signed < 15) {
@@ -179,11 +203,11 @@ void MoveCar() {
    /*   Serial.println("Bad lidar reading. Trying to follow LEFT wall.");     
       Serial.print("Speed: ");
       Serial.println(Speed);*/
-    }  
-  }
+   // }  
+ // }
      
   // WALLS ON BOTH SIDES  (walls or objects on both sides)
-  else if ((abs(Input) < 150) && ((Sonic_L_signed < 150) && (Sonic_R_signed < 150))) {  
+  /*else if ((abs(Input) < 150) && ((Sonic_L_signed < 150) && (Sonic_R_signed < 150))) {  
   //  Serial.println("   CASE 2");
       // Turn amount 5:max , 0:none
       if (abs(Input) > 100) 
@@ -220,7 +244,7 @@ void MoveCar() {
           Serial.print(turnNumber);
           Serial.print("    Angle: ");
           Serial.println(Angle);*/
-      }
+    /*  }
       else { // turnNumber == 0 (no turn)
         wheels.write(90);
  //       Serial.println("Wheels: Straight   turnNumber: 0"); 
@@ -230,27 +254,30 @@ void MoveCar() {
       esc.write(Speed);
   //    Serial.print("Speed: ");
   //    Serial.println(Speed);
-  }
+  }*/
 
 
   // OPENING ON ONE OR BOTH SIDES
-  else {
+ // else {
     //  Serial.println("   CASE 3");
  
       // slow down while one or more walls is missing
-      Speed = 77;
-      esc.write(Speed); // go slow when no walls on either side (for now at least)  
+//      Speed = 77;
+   //   esc.write(Speed); // go slow when no walls on either side (for now at least)  
       // no walls
-      if ((Sonic_L_signed > 155) && (Sonic_R_signed > 155)) {
+      if ((Sonic_L_signed > 255) && (Sonic_R_signed > 255)) {
 //          if (Input == 0) // straight
 //            Offset = 0;
 //          else if (Input < 0) // closer to left, drift right slightly
 //            Offset = -5;
 //          else if (Input > 0) // closer to right, drift left slightly
 //            Offset = 5;
-          Offset = 60;
-          Angle = 90 + Offset;
-          wheels.write(Angle);
+          esc.write(115);
+        wheels.write(90);
+        delay(1000);
+       esc.write(65);
+       wheels.write(40);
+       delay(3000);
     /*      Serial.println("NO WALLS! Slowing down.");
           Serial.print("Speed: ");
           Serial.println(Speed);*/
@@ -269,7 +296,7 @@ void MoveCar() {
         Serial.println(Speed);*/
       }
       // no right wall
-      else if (Sonic_R_signed > Sonic_L_signed && Sonic_R_signed >150 && Turn == 1) {
+      else if (Sonic_R_signed > Sonic_L_signed && Sonic_R_signed >250 && Turn==1) {
         // try to stay ~2ft from only (left) wall
 //        if (Sonic_L_signed > 95) // move closer to only (left) wall
 //          wheels.write(100);
@@ -280,12 +307,15 @@ void MoveCar() {
    /*     Serial.println("No RIGHT wall! slowing down.");     
         Serial.print("Speed: ");
         Serial.println(Speed);*/
-       esc.write(80);
-       wheels.write(50);
-       delay(3000);
+        esc.write(115);
+        wheels.write(90);
+        delay(1000);
+       esc.write(65);
+       wheels.write(40);
+       delay(4000);
        Turn = 1;
       } 
-    }
+   // }
  
  // Serial.println();
 }
@@ -395,7 +425,7 @@ void checkCommand() {
       Serial.println();
       Serial.println("Remote BACK received.");
       Serial.println();
-      esc.write(130);
+      esc.write(110);
       wheels.write(90);
     }
     }
@@ -404,7 +434,7 @@ void checkCommand() {
       if (r == '1') {
       Serial.println("Remote FORWARD auto received. Calibrating ESC.");
       Start = 1;
-      esc.write(75);
+      esc.write(65);
       wheels.write(90);
     }
     // FORWARD command received
@@ -467,6 +497,9 @@ void setup() {
   esc.attach(ESC_PIN);
   wheels.attach(WHEEL_PIN);
 
+  Setpoint = 0;
+  myPID.SetMode(AUTOMATIC);
+  myPID.SetOutputLimits(-25, 25);
   // Remote start
   for (int i = 0; i < 100; i++)
   Serial.println();
@@ -508,7 +541,7 @@ void setup() {
 /*****************************************Loop**********************************************/
 void loop() {
   //checkMode();
- // esc.write(78);
+  esc.write(65);
   // Remote
   checkCommand();
  // Serial.println(Manual);
@@ -525,5 +558,6 @@ void loop() {
     Poll_Sonic();
     PID_Control();
   }
+  //delay(500);
 }
 

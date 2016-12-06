@@ -23,7 +23,7 @@
 // Remote
 SoftwareSerial XBee(2,3); // RX, TX
 int Start = 0;
-int Manual = 0;
+int Manual = 1;
 int Turn = 1;
 
 // Servo global variables
@@ -369,36 +369,24 @@ void checkCommand() {
  // } 
  // while (r != -1);
  // data = data.substring(0,data.length() - 1);
-  }
-  
+  }  
   // Check data for server shutdown signal while awaiting handshake
 //  for (int i=0;i<data.length();i++) {
-    if (r == 'a') {
-      Serial.println("Remote AUTO DRIVE received. Calibrating ESC.");
-    //  Start = 1;
-      Manual = 0;
-    }
-    //manual drive command received
-    else if (r == 'm') {
-      Serial.println();
-      Serial.println("Remote MANUAL DRIVE received. Exiting Loop.");
-      Serial.println();
-     // Start = 0;
-      Manual = 1;
-      delay(250);
-    //  setup();
-    }
     // FORWARD command received
     if(Manual == 1)
     {
-       if (r == '1') {
+      switch(r){
+       case '1': 
+       {
       Serial.println("Remote FORWARD received. Calibrating ESC.");
      // Start = 1;
       esc.write(60);
       wheels.write(90);
+      break;
        }
     // FORWARD command received
-      else if (r == '0') {
+      case '0':
+      {
       Serial.println();
       Serial.println("Remote OFF received. Exiting Loop.");
       Serial.println();
@@ -406,39 +394,70 @@ void checkCommand() {
       wheels.write(90);
      // delay(250);
       setup();
+      break;
       }
-    else if(r== '2') {
+    case '2':
+    {
       Serial.println();
       Serial.println("Remote LEFT TURN received.");
       Serial.println();
      // delay(250);
       wheels.write(130);
+      break;
     }
-    else if(r == '3') {
+    case '3':
+    {
       Serial.println();
       Serial.println("Remote RIGHT TURN received.");
       Serial.println();
      // delay(250);
       wheels.write(50);
+      break;
     }
-    else if(r == '4') {
+    case '4': 
+    {
       Serial.println();
       Serial.println("Remote BACK received.");
       Serial.println();
       esc.write(110);
       wheels.write(90);
+      break;
+    }
+    case 'a':
+    {
+      Serial.println("Remote AUTO DRIVE received. Calibrating ESC.");
+    //  Start = 1;
+      Manual = 0;
+      break;
+    }
+    //manual drive command received
+    case 'm':
+    {
+      Serial.println();
+      Serial.println("Remote MANUAL DRIVE received. Exiting Loop.");
+      Serial.println();
+     // Start = 0;
+      Manual = 1;
+   //   delay(250);
+    //  setup();
+    break;
+    }
     }
     }
     else if(Manual == 0)
     {
-      if (r == '1') {
+      switch(r){
+      case '1':
+      {
       Serial.println("Remote FORWARD auto received. Calibrating ESC.");
       Start = 1;
       esc.write(65);
       wheels.write(90);
+      break;
     }
     // FORWARD command received
-    else if (r == '0') {
+    case '0': 
+    {
       Serial.println();
       Serial.println("Remote OFF auto received. Exiting Loop.");
       Serial.println();
@@ -446,8 +465,9 @@ void checkCommand() {
       wheels.write(90);
       //delay(250);
       setup();
+      break;
     }
-    else if (r == 'n') {
+    case 'n': {
       Serial.println();
       Turn = 0;
       Serial.println("Not Turn");
@@ -455,9 +475,28 @@ void checkCommand() {
 //      esc.write(80);
 //      wheels.write(40);
      // delay(250);
+     break;
+    }
+    case 'a': {
+      Serial.println("Remote AUTO DRIVE received. Calibrating ESC.");
+    //  Start = 1;
+      Manual = 0;
+      break;
+    }
+    //manual drive command received
+    case 'm': 
+    {
+      Serial.println();
+      Serial.println("Remote MANUAL DRIVE received. Exiting Loop.");
+      Serial.println();
+     // Start = 0;
+      Manual = 1;
+   //   delay(250);
+    //  setup();
+    break;
     }
     }
-  //}
+  }
 }
 
 /*void checkOn() {

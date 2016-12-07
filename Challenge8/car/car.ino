@@ -41,7 +41,7 @@ long lidar, lidar_dist;
 
 // Global flags
 int ObjectDetected = 0;
-int State = 0;
+int Count = 0;
 
 /************************************Sonic L/R***************************************/
 
@@ -122,11 +122,12 @@ void MoveCar() {
     myPID.Compute();
     Serial.println("output");
     Serial.println(Output);
-    wheels.write(90-Output);
+    wheels.write(90 - Output);
   //}
   //IF NO WALL ON ANY SIDE
   if ((Sonic_L_signed > 255) && (Sonic_R_signed > 255)) {
     Serial.println("NO WALLS");
+    Turn = 1;
     esc.write(115);
     wheels.write(90);
     delay(1000);
@@ -137,9 +138,9 @@ void MoveCar() {
   //IF NO LEFT WALL ONLY
   else if ((Sonic_L_signed > Sonic_R_signed) && Sonic_L_signed > 255 && Sonic_R_signed < 160) {
     Serial.println("NO LEFT WALL");
-    if (Sonic_R_signed > 95) // move closer to only (right) wall
+    if (Sonic_R_signed > 95) // move closer to right wall
       wheels.write(80);
-    else if (Sonic_R_signed < 70) // move further from only (right) wall
+    else if (Sonic_R_signed < 70) // move further from right wall
       wheels.write(140);
     else 
       wheels.write(90);
@@ -149,23 +150,34 @@ void MoveCar() {
     Serial.println("NO RIGHT WALL");
     //FIRST CORNER
     if(Turn == 1) {
+      if(Count < 3) {
+        Count++;
+      }
       esc.write(115);
       wheels.write(90);
       delay(1000);
       esc.write(65);
       wheels.write(40);
       delay(1000);
+      if(Count == 2) {
+        esc.write(90);
+        delay(1500);
+      }
     }
     //ELEVATOR
     else {
       Serial.println("                    ELEVATOR!!");
-      esc.write(30);
-      if (Sonic_L_signed > 95) // move closer to left wall
-        wheels.write(100);
-      else if (Sonic_L_signed < 70) // move further from left wall
-        wheels.write(80);
-      else 
-        wheels.write(90);
+      //IF CAR PASSED FIRST CORNER
+      if(Count >= 2) {
+        if (Sonic_L_signed > 95) // move closer to left wall
+          wheels.write(120);
+        else if (Sonic_L_signed < 70) // move further from left wall
+          wheels.write(80);
+        else 
+          wheels.write(90);
+        esc.write(30);
+        delay(2200);
+      }
       Turn = 1;
     }
   } 

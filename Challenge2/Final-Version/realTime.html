@@ -1,0 +1,119 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; background-color: #f8f8f8;}
+      #mycanvas {margin-left: 300px; margin-top: 50px;}
+      h1 {margin-top:50px; margin-left:500px;}
+      #sensor_group {margin-left: 450px; margin-top: -400px;}
+      #one{color:rgb(0 , 255 , 0);}
+      #button {margin-top:500px; margin-left:500px;margin-bottom:100px;width:200px; height:75px;color:blue;font-size:15px;}
+      #graphdiv{margin-left: 50px;width:1000px; height:400px ;}
+      hr {width:700px; margin-top:100px; margin-left:300px;}
+      footer {font-family: Arial; margin-left:500px;margin-top:20px;margin-bottom:100px;}
+      #value_group {margin-left:625px; margin-top: -317px;}
+    </style>
+    <script src= "https://cdnjs.cloudflare.com/ajax/libs/smoothie/1.27.0/smoothie.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dygraph/1.1.1/dygraph-combined-dev.js"></script>
+    <!-- <script src="/public/smoothie.js"></script> -->
+    <!-- <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script> -->
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+  </head>
+  <body>
+    <h1>Real Time Temp Analysis</h1>
+    <canvas id="mycanvas" width="600" height="500"></canvas>
+    <!--<div id="sensor_group">
+         <h1 id = "one">sensor 1 = </h1>
+         <h1 id = "two">sensor 2 = </h1>
+         <h1 id = "three">sensor 3 = </h1>
+         <h1 id = "four">sensor 4 = </h1>
+         <h1 id = "ave">average = </h1>
+   </div>-->
+   <div id="value_group">
+        <h1 id = "val_one"> </h1>
+        <h1 id = "val_two"> </h1>
+        <h1 id = "val_three"> </h1>
+        <h1 id = "val_four"> </h1>
+        <h1 id = "val_ave"> </h1>
+  </div>
+
+
+  <div id="dy">
+  <div id="graphdiv"></div>
+  </div>
+
+   <hr>
+   <footer>
+        <h4>Running on node.js | socket.io | Express.js | Mongodb</h4>
+   </footer>
+  <script>
+        var socket = io();
+
+ //----------------------Real Time Graph ----------------------------------//
+        var smoothie = new SmoothieChart( {
+        grid: { strokeStyle:'rgb(125, 0, 0)', fillStyle:'rgb(60, 0, 0)',
+        lineWidth: 1, millisPerLine: 2000, verticalSections: 6, },
+        minValue:15,
+        maxValue:30,
+        interpolation:"bezier",
+        labels: { fillStyle:'rgb(255, 255, 255)' },
+        sharpLines:true,
+        labels:{fontSize:15},
+        horizontalLines:{color:'#ffff6f',lineWidth:1,value:0},
+        timestampFormatter:SmoothieChart.timeFormatter
+        });
+
+
+        var lineA = new TimeSeries();
+        var lineB = new TimeSeries();
+        var lineC = new TimeSeries();
+        var lineD = new TimeSeries();
+        var lineE = new TimeSeries();
+
+        smoothie.addTimeSeries(lineA, { strokeStyle:'rgb(255 , 255 , 255)', lineWidth:3 });
+        smoothie.addTimeSeries(lineB, { strokeStyle:'rgb(0 ,255 , 0)', lineWidth:3 });
+        smoothie.addTimeSeries(lineC, { strokeStyle:'rgb(0 ,0 , 255)', lineWidth:3 });
+        smoothie.addTimeSeries(lineD, { strokeStyle:'rgb(255 ,255 , 0)',  lineWidth:3 });
+        smoothie.addTimeSeries(lineE, { strokeStyle:'rgb(255 ,0 , 0)', lineWidth:3});
+
+
+        smoothie.streamTo(document.getElementById("mycanvas"), 2500 /*delay*/);
+
+
+
+
+
+
+        socket.on('1', function(data) {
+        lineA.append(new Date().getTime(),data);
+        $(document.getElementById('val_one')).text("sensor 1:" + data);
+
+        });
+
+        socket.on('2', function(data) {
+        lineB.append(new Date().getTime(),data);
+        $(document.getElementById('val_two')).text("sensor2:" + '\t' + data);
+        });
+
+        socket.on('3', function(data) {
+        lineC.append(new Date().getTime(),data);
+        $(document.getElementById('val_three')).text("sensor3:" + '\t' + data);
+        });
+
+        socket.on('4', function(data) {
+        lineD.append(new Date().getTime(),data);
+        $(document.getElementById('val_four')).text("sensor4:" + '\t' + data);
+        });
+
+        socket.on('average', function(ave){
+        lineE.append(new Date().getTime(), ave);
+        $(document.getElementById('val_ave')).text("average:" + '\t' + ave);
+        });
+
+
+    </script>
+  </body>
+</html>

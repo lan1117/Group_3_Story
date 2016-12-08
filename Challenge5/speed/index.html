@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <title>Speed Control</title>
+
+
+
+      <link rel="stylesheet" href="css/style.css">
+
+
+</head>
+
+<body>
+  <h1>Challenge 5 : Speed Control</h1>
+
+<div class="knob-surround">
+
+  <div class="knob"></div>
+
+  <span class="min">Stop</span>
+  <span class="max">Fast</span>
+
+  <div class="ticks">
+    <div class="tick activetick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+    <div class="tick"></div>
+  </div>
+
+</div>
+
+<p>Group 3</p>
+<p>Target Speed : <span class="current-value" id='taresc'></span></p>
+<p><span id='curesc'></span></p>
+  <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+   <script src="js/index.js"></script>
+  <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'>
+    </script>
+  <script type="text/javascript">
+    var socket = io();
+    socket.on('1', function(data) {
+
+      $(document.getElementById('curesc')).text("Current Speed : " + data);
+    });
+    var string = $(getElementById('taresc').value);
+    socket.emit("cp",string);
+
+</script>
+
+</body>
+</html>

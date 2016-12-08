@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+<title>Challenge 6</title>
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/font-awesome.min.css" rel="stylesheet">
+<link href="css/animate.min.css" rel="stylesheet">
+<link href="css/lightbox.css" rel="stylesheet">
+<link href="css/main.css" rel="stylesheet">
+<link href="css/responsive.css" rel="stylesheet">
+<link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900|Quicksand:400,700|Questrial" rel="stylesheet" />
+<link href="default.css" rel="stylesheet" type="text/css" media="all" />
+<link href="fonts.css" rel="stylesheet" type="text/css" media="all" />
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+
+  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script>
+    var socket = io();
+    var location1 = [0,0];
+    var i = 0;
+    socket.on('location', function(location){
+      i = location ;
+      if(i < 21){ location1=[parseInt(i) - 1 , 0] ;}
+      else if (i < 27) {
+        locaiton1=[19 ,parseInt(i)-6];}
+        else if (i < 46) {
+          location1=[46-parseInt(i), 6];}
+          else {
+            location1=[0 , 51-parseInt(i)];}
+    });
+  </script>
+  <script>
+     var Red = null;
+        function init(){
+  			   Red = document.getElementById('Red');
+           Red.style.position= 'absolute';
+           Red.style.left ="270px";
+  			   Red.style.top="170px";
+
+              }
+  			function moveRight(){
+  				Red.style.left = 270 + Math.round(location1[0] * 31) + 'px';
+  				Red.style.top = 160 + Math.round(location1[1] * 87) + 'px';
+  			}
+
+              window.onload = init;
+  			setInterval(function(){
+  			moveRight();
+  			   }, 1000);
+  </script>
+	    <script src="js/html5shiv.js"></script>
+	    <script src="js/respond.min.js"></script>
+</head><!--/head-->
+<style type = "text/css">
+button{
+	font-size: 10px;
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+	width: 40px;
+	hight: 20px;
+}
+img.video{
+	position: absolute;
+	top: 20%;
+	left: 5%;
+	width: 40%;
+	height: 90%;
+}
+img.room{
+	position: absolute;
+	top: 20%;
+	left: 50%;
+	width: 40%;
+	height: 90%;
+}
+
+</style>
+<body>
+  <header id="header">
+        <div class="navbar navbar-inverse" role="banner">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="index.html">
+                      <h1>Challenge 6</h1>
+                      <h1>Group3---Localization</h1>
+                      <p>Photonics Center 4th floor</p>
+                    </a>
+
+                </div>
+            </div>
+        </div>
+        </header>
+    <!--/#header-->
+    <div class="wrapper">
+    <img id="video" src="http://ec544d.ddns.net:8081/" class="video" top="200px" left="100px" height="650px" width="400px"/>
+  	<img id="room" class="room" src="images/0.png" left="780px" width="400" height="650" alt="" /></div>
+  	<div style="margin-left:240px; width:1200px;">
+      <img id="Red" class="point" src="images/Red.png" position="relative" height="30px" width="30px"/>
+      <button onClick="forward()" class="myButton" style="position: absolute; top: 136px; left: 230px;">Forward</button>
+	<p><button onClick="right()" class="myButtonPink" style="position: absolute; top: 210px; left: 318px;">Right</button>
+	<button onClick="stop()" class="myButtonRed" style="position: absolute; top: 210px; left: 230px;">Stop</button>
+	<button onClick="left()" class="myButtonBlue" style="position: absolute; top: 210px; left: 147px;">Left</button>
+	</p>
+	<button onClick="back()" class="myButton" style="position: absolute; top: 285px; left: 230px;">Back</button>
+	<div id="welcome" class="container">
+	<div>
+	<label style="margin-left:445px; margin-top:20px;">
+		<input id="checkbox" type="checkbox" onclick onchange="onoff()"/>
+		<span data-on="On" data-off="Off"></span>
+	</label>
+	</div>
+  </div>
+  </div>
+
+    <!--/#home-slider-->
+
+
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/lightbox.min.js"></script>
+    <script type="text/javascript" src="js/wow.min.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+</body>
+</html>

@@ -141,13 +141,19 @@ void MoveCar() {
     Serial.println("NO WALLS");
     esc.write(110);
     wheels.write(105);
-    delay(1000);
+    delay(800);
     esc.write(70);
     wheels.write(40);
     delay(1000);
     esc.write(110);
     wheels.write(105);
+    delay(800);
+    esc.write(70);
+    wheels.write(40);
     delay(1000);
+    esc.write(110);
+    wheels.write(105);
+    delay(800);
     esc.write(70);
     wheels.write(40);
     delay(1000);
@@ -181,7 +187,7 @@ void MoveCar() {
     Serial.println("NO RIGHT WALL");
     //FIRST CORNER
     int t1=millis()  - t;
-    if(t1>7000) {
+    if(t1 > 4500) {
       Serial.print("millis");
       Serial.println(t1);
       Serial.print("t");
@@ -191,7 +197,7 @@ void MoveCar() {
       delay(1000);
       esc.write(70);
       wheels.write(40);
-      delay(1200);
+      delay(1300);
       //ONE MORE TURN
       esc.write(110);
       wheels.write(115);
@@ -209,7 +215,7 @@ void MoveCar() {
       Serial.print("t");
       Serial.print(t);
       //IF CAR PASSED FIRST CORNER
-      esc.write(65);
+      esc.write(70);
       while(Sonic_R_signed > 180) {
         GetSonic();
         ObstacleDetect();
@@ -270,7 +276,7 @@ void checkCommand() {
         Serial.println();
         Serial.println("Remote BACK received.");
         Serial.println();
-        esc.write(110);
+        esc.write(105);
         wheels.write(90);
         break;
       }

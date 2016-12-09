@@ -10,8 +10,10 @@ Version    : 1.0
 Released   : 20140322
 
 -->
+
 <html xmlns="http://www.w3.org/1999/xhtml">
 <style type = "text/css">
+body {background-color: lightyellow;}
 button{
   font-size: 10px;
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
@@ -34,6 +36,7 @@ button{
 
 <!--[if IE 6]><link href="default_ie6.css" rel="stylesheet" type="text/css" /><![endif]-->
   <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+  <script type="text/javascript" src="js/shortcut.js"></script>
 
 
  <script>
@@ -41,12 +44,32 @@ button{
   var location1 = [0,0];
   var location2 = [0,0];
   var location3 = [0,0];
+  var key = 0;
 
   var cStatus = [0];
   var sendStatus = [0];
   socket.on('updated CarStatus', function(msg){
     cStatus[0] = parseInt(msg.charAt(0));
   });
+shortcut.add("left", function(){
+  left(1);
+})
+
+shortcut.add("up", function(){
+  start(1);
+})
+
+shortcut.add("right", function(){
+  right(1);
+});
+
+shortcut.add("down", function(){
+  back(1);
+});
+
+shortcut.add("s", function(){
+  stop(1);
+})
 
 function start(num){
   cStatus[num - 1] = 1;
@@ -87,13 +110,13 @@ function off(num){
       location1 = [1 - parseInt(location), 0]
     }
     else if(parseInt(location) >7 && parseInt(location) <=9){
-      location1 = [-6, parseInt(location) － 7 ]
+      location1 = [-6, parseInt(location) - 7 ]
     }
     else if(parseInt(location) >9 && parseInt(location) <=15){
       location1 = [parseInt(location) - 15, 2]
     }
     else if(parseInt(location) >15 ){
-      location1 = [0, 17 － parseInt(location)]
+      location1 = [0, 17 - parseInt(location)]
     }
     console.log("location1:" + location1);
     //location1 = [parseInt(location) / 6 * 25, ((parseInt(location) % 6) - 1) * 28];
@@ -113,8 +136,8 @@ function off(num){
 			   xbeel = document.getElementById('left');
 			   xbeeb = document.getElementById('bottom');
 			   xbeeb2 = document.getElementById('bottom2');
-               Red.style.position= 'absolute';
-               Red.style.left ="935px"; 
+         Red.style.position= 'absolute';
+         Red.style.left ="935px";
 			   Red.style.top="120px";
 			   xbeer.style.position='absolute';
 			   xbeer.style.left="880px";
@@ -149,7 +172,7 @@ function off(num){
 </div>
 <div class="wrapper">
 	<img id="room" class="displayed" src="images/0.png"  style="position: absolute; top: 15%; left: 50%; width: 420px; height: 600px;" /></div>
-  <div style="margin:0 auto; width:1000px;"><img id="Red" class="point" src="images/Red.png" alt="CAR" position="absolute" height="30px" width="30px"/>
+  <div style="margin:0 auto; width:1000px;"><img id="Red" class="point" src="images/4.png" alt="CAR" position="absolute" height="30px" width="30px"/>
     <h4>AUTO MODE:</h4>
     <button onclick = "on(1)"> On </button>
     <button onclick = "off(1)" > Off </button>

@@ -18,7 +18,7 @@
 // Remote
 SoftwareSerial XBee(2,3); // RX, TX
 int Start = 0;
-int Manual = 0;
+int Manual = 1;
 int Turn = 1;
 
 // Servo global variables
@@ -26,7 +26,7 @@ Servo wheels;
 Servo esc;
 
 double Setpoint = 0, Input, Output;
-double aggKp = 10, aggKi = 0.005, aggKd = 3;
+double aggKp = 7, aggKi = 0.001, aggKd = 3;
 double consKp = 1, consKi = 0, consKd = 0.25;
 
 PID myPID(&Input, &Output, &Setpoint, consKp, consKi, consKd, DIRECT);
@@ -41,7 +41,8 @@ long lidar, lidar_dist;
 
 // Global flags
 int ObjectDetected = 0;
-int State = 0;
+int Count = 0;
+int t = 0;
 
 /************************************Sonic L/R***************************************/
 
@@ -55,10 +56,10 @@ void GetSonic()
   Sonic_L_signed = dist1 * 2.54;
   Sonic_R_signed = dist2 * 2.54;
   Input = (Sonic_L_signed - Sonic_R_signed)/2; 
-  PrintSonic();
+//  PrintSonic();
 }
 
-void PrintSonic()
+/*void PrintSonic()
 {
   Serial.print("Left: ");
   Serial.println(Sonic_L_signed);
@@ -66,7 +67,7 @@ void PrintSonic()
   Serial.println(Sonic_R_signed);
   Serial.print("                                          Input (L - R): ");
   Serial.println(Input);
-}
+}*/
 
 /**********************************Lidar Detect Obstacle*********************************/
 
@@ -74,7 +75,7 @@ void GetLidar() {
   lidar = pulseIn(LIDAR_MON, HIGH) / 10; // 10usec = 1 lidar_dist of distance for LIDAR-Lite
   lidar_dist = double(lidar);
   
-  if (lidar_dist < 70)               // CHANGE THIS BACK AFTER TESTING
+  if (lidar_dist < 50)               // CHANGE THIS BACK AFTER TESTING
     ObjectDetected = 1;
   else
     ObjectDetected = 0;
@@ -103,11 +104,22 @@ void ObstacleDetect() {
     MoveCar();
   else {
     Serial.println("            OBJECT DETECTED!");
-    esc.write(90);
-    delay(500);
+//    esc.write(90);
+//    delay(500);
     esc.write(110);
     wheels.write(90);
     delay(1000);
+  }
+}
+void ObstacleDetectManual() {
+  if (!ObjectDetected)
+    MoveCar();
+  else {
+    Serial.println("            OBJECT DETECTED!");
+//    esc.write(90);
+//    delay(500);
+    esc.write(90);
+    wheels.write(90);
   }
 }
 
@@ -116,57 +128,98 @@ void ObstacleDetect() {
 void MoveCar() {
   //IF WALLS ON BOTH SIDES, DO PID CONTROL
   //if ((abs(Input) < 160) && ((Sonic_L_signed < 160) && (Sonic_R_signed < 160))) {
-    esc.write(65);
+    esc.write(70);
     Serial.println("WALL ON BOTH SIDES");
     myPID.SetTunings(aggKp, aggKi, aggKd);
     myPID.Compute();
-    Serial.println("output");
-    Serial.println(Output);
-    wheels.write(90-Output);
+  //  Serial.println("output");
+   // Serial.println(Output);
+    wheels.write(90 - Output);
   //}
   //IF NO WALL ON ANY SIDE
-  if ((Sonic_L_signed > 255) && (Sonic_R_signed > 255)) {
+  if ((Sonic_L_signed > 250) && (Sonic_R_signed > 250)) {
     Serial.println("NO WALLS");
-    esc.write(115);
-    wheels.write(90);
+    esc.write(110);
+    wheels.write(105);
     delay(1000);
-    esc.write(65);
+    esc.write(70);
     wheels.write(40);
     delay(1000);
+    esc.write(110);
+    wheels.write(105);
+    delay(1000);
+    esc.write(70);
+    wheels.write(40);
+    delay(1000);
+    //ONE MORE TURN
+    if((millis() - t) < 7000) {
+      while(Sonic_R_signed > 180) {
+        GetSonic();
+        ObstacleDetect();
+        if (Sonic_R_signed > 95) // move closer to left wall
+          wheels.write(75);
+        else if (Sonic_R_signed < 70) // move further from left wall
+          wheels.write(115);
+        else 
+          wheels.write(90);
+      }
+      t = millis();
+    }
   }
   //IF NO LEFT WALL ONLY
-  else if ((Sonic_L_signed > Sonic_R_signed) && Sonic_L_signed > 255 && Sonic_R_signed < 160) {
+  else if ((Sonic_L_signed > Sonic_R_signed) && Sonic_L_signed > 200 && Sonic_R_signed < 150) {
     Serial.println("NO LEFT WALL");
-    if (Sonic_R_signed > 95) // move closer to only (right) wall
+    if (Sonic_R_signed > 95) // move closer to right wall
       wheels.write(80);
-    else if (Sonic_R_signed < 70) // move further from only (right) wall
+    else if (Sonic_R_signed < 70) // move further from right wall
       wheels.write(140);
     else 
       wheels.write(90);
   }
   //IF NO RIGHT WALL ONLY
-  else if ((Sonic_R_signed > Sonic_L_signed) && Sonic_R_signed >250 && Sonic_L_signed < 160) {
+  else if ((Sonic_R_signed > Sonic_L_signed) && Sonic_R_signed >180 && Sonic_L_signed < 160) {
     Serial.println("NO RIGHT WALL");
     //FIRST CORNER
-    if(Turn == 1) {
-      esc.write(115);
-      wheels.write(90);
+    int t1=millis()  - t;
+    if(t1>7000) {
+      Serial.print("millis");
+      Serial.println(t1);
+      Serial.print("t");
+      Serial.print(t);
+      esc.write(110);
+      wheels.write(115);
       delay(1000);
-      esc.write(65);
+      esc.write(70);
       wheels.write(40);
+      delay(1200);
+      //ONE MORE TURN
+      esc.write(110);
+      wheels.write(115);
       delay(1000);
+      esc.write(70);
+      wheels.write(40);
+      delay(1200);
+      t = millis();
     }
-    //ELEVATOR
     else {
+    //ELEVATOR
       Serial.println("                    ELEVATOR!!");
-      esc.write(30);
-      if (Sonic_L_signed > 95) // move closer to left wall
-        wheels.write(100);
-      else if (Sonic_L_signed < 70) // move further from left wall
-        wheels.write(80);
-      else 
-        wheels.write(90);
-      Turn = 1;
+      Serial.print("millis");
+      Serial.println(t1);
+      Serial.print("t");
+      Serial.print(t);
+      //IF CAR PASSED FIRST CORNER
+      esc.write(65);
+      while(Sonic_R_signed > 180) {
+        GetSonic();
+        ObstacleDetect();
+        if (Sonic_L_signed > 95) // move closer to left wall
+          wheels.write(120);
+        else if (Sonic_L_signed < 70) // move further from left wall
+          wheels.write(80);
+        else 
+          wheels.write(90);
+      }
     }
   } 
 }
@@ -186,7 +239,7 @@ void checkCommand() {
     switch(r){
       case '1': {
         Serial.println("Remote FORWARD received. Calibrating ESC.");
-        esc.write(60);
+        esc.write(75);
         wheels.write(90);
         break;
       }
@@ -194,22 +247,23 @@ void checkCommand() {
         Serial.println();
         Serial.println("Remote OFF received. Exiting Loop.");
         Serial.println();
+        esc.write(90);
         wheels.write(90);
-        setup();
+        //setup();
         break;
       }
       case '2': {
         Serial.println();
         Serial.println("Remote LEFT TURN received.");
         Serial.println();
-        wheels.write(120);
+        wheels.write(130);
         break;
       }
       case '3': {
         Serial.println();
         Serial.println("Remote RIGHT TURN received.");
         Serial.println();
-        wheels.write(60);
+        wheels.write(50);
         break;
       }
       case '4': {
@@ -240,7 +294,7 @@ void checkCommand() {
       case '1': {
         Serial.println("Remote FORWARD auto received. Calibrating ESC.");
         Start = 1;
-        esc.write(65);
+        esc.write(70);
         wheels.write(90);
         break;
       }
@@ -337,5 +391,9 @@ void loop() {
     GetSonic();
     ObstacleDetect();
   }
+  else {
+    //ObstacleDetectManual();
+  }
 }
+
 

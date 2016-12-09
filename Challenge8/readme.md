@@ -1,6 +1,6 @@
 # EC544 Challenge8 -- Autonomous Driving with Remote Monitoring and Control
 
-
+![image](https://github.com/lan1117/Group_3_Story/blob/master/Challenge8/Group3.jpg)
 
 In this challenge, we created a system for autonomous driving crawler and remote monitoring and controling crawler. And we added FPV real-time video stream and RSS localization at the same time.
 
